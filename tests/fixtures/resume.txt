@@ -1,0 +1,8 @@
+Parteek Singh
+Software Engineer
+
+EXPERIENCE
+Built and operated TypeScript APIs with PostgreSQL, including document ingestion, background jobs, and deployment on Linux. Collaborated with product and design to ship features used by hiring managers every week. Mentored two junior engineers on testing, code review, and production debugging. Improved API latency by caching expensive reads and trimming N-plus-one queries. Owned on-call for the careers platform and wrote runbooks for common failures.
+
+SKILLS
+TypeScript, Python, Node.js, PostgreSQL, Next.js, Docker, testing, technical writing.

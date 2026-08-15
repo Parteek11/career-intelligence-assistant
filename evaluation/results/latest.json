@@ -1,0 +1,362 @@
+{
+  "timestamp": "2026-08-15T14:41:50.600Z",
+  "datasetSize": 10,
+  "configuration": {
+    "topK": 5,
+    "embeddingModel": "Xenova/all-MiniLM-L6-v2",
+    "chunkSize": 900,
+    "chunkOverlap": 120
+  },
+  "perQuestion": [
+    {
+      "id": "technical-01",
+      "question": "What technical skills does the candidate have?",
+      "targetJobId": "all",
+      "topK": 5,
+      "latencyMs": 9.32,
+      "retrieved": [
+        {
+          "documentType": "job_description",
+          "jobId": "c2e4d87c-77b3-4eb4-833f-ada8bba41fb2",
+          "filename": "golden-job-1-backend.txt",
+          "chunkIndex": 0,
+          "similarity": 0.3319575095303382
+        },
+        {
+          "documentType": "resume",
+          "jobId": null,
+          "filename": "golden-resume.txt",
+          "chunkIndex": 0,
+          "similarity": 0.2990162790407973
+        },
+        {
+          "documentType": "job_description",
+          "jobId": "0edbc210-1a8e-4ec1-9a2b-8768156fb443",
+          "filename": "golden-job-2-frontend.txt",
+          "chunkIndex": 0,
+          "similarity": 0.26847253629728984
+        },
+        {
+          "documentType": "job_description",
+          "jobId": "8ddde365-a342-4aa6-b2ad-c68c76ae2c5e",
+          "filename": "golden-job-3-cloud.txt",
+          "chunkIndex": 0,
+          "similarity": 0.24225653523364077
+        },
+        {
+          "documentType": "job_description",
+          "jobId": "5399153b-0b2a-452e-b2b3-580bf969dca0",
+          "filename": "golden-job-4-ai-rag.txt",
+          "chunkIndex": 0,
+          "similarity": 0.16900210565316076
+        }
+      ],
+      "metrics": {
+        "precisionAtK": 0.2,
+        "recallAtK": 1,
+        "conceptHitRate": 1,
+        "jobFilterAccuracy": null,
+        "jobCoverage": 1
+      }
+    },
+    {
+      "id": "backend-01",
+      "question": "Does the candidate have backend engineering experience relevant to this role?",
+      "targetJobId": "job_1",
+      "topK": 5,
+      "latencyMs": 3.01,
+      "retrieved": [
+        {
+          "documentType": "job_description",
+          "jobId": "c2e4d87c-77b3-4eb4-833f-ada8bba41fb2",
+          "filename": "golden-job-1-backend.txt",
+          "chunkIndex": 0,
+          "similarity": 0.5697697920842104
+        },
+        {
+          "documentType": "resume",
+          "jobId": null,
+          "filename": "golden-resume.txt",
+          "chunkIndex": 0,
+          "similarity": 0.4399306655136943
+        }
+      ],
+      "metrics": {
+        "precisionAtK": 1,
+        "recallAtK": 1,
+        "conceptHitRate": 1,
+        "jobFilterAccuracy": 1,
+        "jobCoverage": null
+      }
+    },
+    {
+      "id": "frontend-01",
+      "question": "What frontend skills are required for this role?",
+      "targetJobId": "job_2",
+      "topK": 5,
+      "latencyMs": 2.42,
+      "retrieved": [
+        {
+          "documentType": "job_description",
+          "jobId": "0edbc210-1a8e-4ec1-9a2b-8768156fb443",
+          "filename": "golden-job-2-frontend.txt",
+          "chunkIndex": 0,
+          "similarity": 0.5262916182130738
+        },
+        {
+          "documentType": "resume",
+          "jobId": null,
+          "filename": "golden-resume.txt",
+          "chunkIndex": 0,
+          "similarity": 0.48730942153078627
+        }
+      ],
+      "metrics": {
+        "precisionAtK": 0.5,
+        "recallAtK": 1,
+        "conceptHitRate": 1,
+        "jobFilterAccuracy": 1,
+        "jobCoverage": null
+      }
+    },
+    {
+      "id": "cloud-01",
+      "question": "What cloud skills are required for this role?",
+      "targetJobId": "job_3",
+      "topK": 5,
+      "latencyMs": 2.6,
+      "retrieved": [
+        {
+          "documentType": "job_description",
+          "jobId": "8ddde365-a342-4aa6-b2ad-c68c76ae2c5e",
+          "filename": "golden-job-3-cloud.txt",
+          "chunkIndex": 0,
+          "similarity": 0.5848352616436391
+        },
+        {
+          "documentType": "resume",
+          "jobId": null,
+          "filename": "golden-resume.txt",
+          "chunkIndex": 0,
+          "similarity": 0.4647413471186972
+        }
+      ],
+      "metrics": {
+        "precisionAtK": 0.5,
+        "recallAtK": 1,
+        "conceptHitRate": 1,
+        "jobFilterAccuracy": 1,
+        "jobCoverage": null
+      }
+    },
+    {
+      "id": "ai-rag-01",
+      "question": "What AI or RAG-related skills are required for this job?",
+      "targetJobId": "job_4",
+      "topK": 5,
+      "latencyMs": 3.43,
+      "retrieved": [
+        {
+          "documentType": "job_description",
+          "jobId": "5399153b-0b2a-452e-b2b3-580bf969dca0",
+          "filename": "golden-job-4-ai-rag.txt",
+          "chunkIndex": 0,
+          "similarity": 0.3966579735279083
+        },
+        {
+          "documentType": "resume",
+          "jobId": null,
+          "filename": "golden-resume.txt",
+          "chunkIndex": 0,
+          "similarity": 0.27985671162605286
+        }
+      ],
+      "metrics": {
+        "precisionAtK": 0.5,
+        "recallAtK": 1,
+        "conceptHitRate": 1,
+        "jobFilterAccuracy": 1,
+        "jobCoverage": null
+      }
+    },
+    {
+      "id": "leadership-01",
+      "question": "Does the candidate have leadership or mentoring experience?",
+      "targetJobId": "job_1",
+      "topK": 5,
+      "latencyMs": 2.57,
+      "retrieved": [
+        {
+          "documentType": "job_description",
+          "jobId": "c2e4d87c-77b3-4eb4-833f-ada8bba41fb2",
+          "filename": "golden-job-1-backend.txt",
+          "chunkIndex": 0,
+          "similarity": 0.3124929573389319
+        },
+        {
+          "documentType": "resume",
+          "jobId": null,
+          "filename": "golden-resume.txt",
+          "chunkIndex": 0,
+          "similarity": 0.22716777295394475
+        }
+      ],
+      "metrics": {
+        "precisionAtK": 0.5,
+        "recallAtK": 1,
+        "conceptHitRate": 1,
+        "jobFilterAccuracy": 1,
+        "jobCoverage": null
+      }
+    },
+    {
+      "id": "domain-01",
+      "question": "Does the candidate have relevant backend systems domain experience for this role?",
+      "targetJobId": "job_1",
+      "topK": 5,
+      "latencyMs": 3.86,
+      "retrieved": [
+        {
+          "documentType": "job_description",
+          "jobId": "c2e4d87c-77b3-4eb4-833f-ada8bba41fb2",
+          "filename": "golden-job-1-backend.txt",
+          "chunkIndex": 0,
+          "similarity": 0.48433846982075224
+        },
+        {
+          "documentType": "resume",
+          "jobId": null,
+          "filename": "golden-resume.txt",
+          "chunkIndex": 0,
+          "similarity": 0.4579040508499155
+        }
+      ],
+      "metrics": {
+        "precisionAtK": 1,
+        "recallAtK": 1,
+        "conceptHitRate": 1,
+        "jobFilterAccuracy": 1,
+        "jobCoverage": null
+      }
+    },
+    {
+      "id": "skill-gap-01",
+      "question": "What skills does the candidate appear to be missing for the cloud infrastructure role?",
+      "targetJobId": "job_3",
+      "topK": 5,
+      "latencyMs": 3.02,
+      "retrieved": [
+        {
+          "documentType": "job_description",
+          "jobId": "8ddde365-a342-4aa6-b2ad-c68c76ae2c5e",
+          "filename": "golden-job-3-cloud.txt",
+          "chunkIndex": 0,
+          "similarity": 0.5927190648411548
+        },
+        {
+          "documentType": "resume",
+          "jobId": null,
+          "filename": "golden-resume.txt",
+          "chunkIndex": 0,
+          "similarity": 0.40342904288422843
+        }
+      ],
+      "metrics": {
+        "precisionAtK": 1,
+        "recallAtK": 1,
+        "conceptHitRate": 1,
+        "jobFilterAccuracy": 1,
+        "jobCoverage": null
+      }
+    },
+    {
+      "id": "interview-prep-01",
+      "question": "What should the candidate prepare to discuss for a technical interview for this backend role?",
+      "targetJobId": "job_1",
+      "topK": 5,
+      "latencyMs": 3.35,
+      "retrieved": [
+        {
+          "documentType": "job_description",
+          "jobId": "c2e4d87c-77b3-4eb4-833f-ada8bba41fb2",
+          "filename": "golden-job-1-backend.txt",
+          "chunkIndex": 0,
+          "similarity": 0.4357257080895649
+        },
+        {
+          "documentType": "resume",
+          "jobId": null,
+          "filename": "golden-resume.txt",
+          "chunkIndex": 0,
+          "similarity": 0.40009096860343474
+        }
+      ],
+      "metrics": {
+        "precisionAtK": 1,
+        "recallAtK": 1,
+        "conceptHitRate": 1,
+        "jobFilterAccuracy": 1,
+        "jobCoverage": null
+      }
+    },
+    {
+      "id": "all-jobs-01",
+      "question": "Which uploaded job requires cloud infrastructure experience?",
+      "targetJobId": "all",
+      "topK": 5,
+      "latencyMs": 2.76,
+      "retrieved": [
+        {
+          "documentType": "job_description",
+          "jobId": "8ddde365-a342-4aa6-b2ad-c68c76ae2c5e",
+          "filename": "golden-job-3-cloud.txt",
+          "chunkIndex": 0,
+          "similarity": 0.6185040399902096
+        },
+        {
+          "documentType": "resume",
+          "jobId": null,
+          "filename": "golden-resume.txt",
+          "chunkIndex": 0,
+          "similarity": 0.4267430258002206
+        },
+        {
+          "documentType": "job_description",
+          "jobId": "c2e4d87c-77b3-4eb4-833f-ada8bba41fb2",
+          "filename": "golden-job-1-backend.txt",
+          "chunkIndex": 0,
+          "similarity": 0.3611447918756707
+        },
+        {
+          "documentType": "job_description",
+          "jobId": "0edbc210-1a8e-4ec1-9a2b-8768156fb443",
+          "filename": "golden-job-2-frontend.txt",
+          "chunkIndex": 0,
+          "similarity": 0.18557386607423476
+        },
+        {
+          "documentType": "job_description",
+          "jobId": "5399153b-0b2a-452e-b2b3-580bf969dca0",
+          "filename": "golden-job-4-ai-rag.txt",
+          "chunkIndex": 0,
+          "similarity": 0.13361473985114158
+        }
+      ],
+      "metrics": {
+        "precisionAtK": 0.2,
+        "recallAtK": 1,
+        "conceptHitRate": 1,
+        "jobFilterAccuracy": null,
+        "jobCoverage": 1
+      }
+    }
+  ],
+  "aggregate": {
+    "precisionAtK": 0.64,
+    "recallAtK": 1,
+    "conceptHitRate": 1,
+    "jobFilterAccuracy": 1,
+    "jobCoverage": 1,
+    "averageLatencyMs": 3.6339999999999995
+  }
+}
