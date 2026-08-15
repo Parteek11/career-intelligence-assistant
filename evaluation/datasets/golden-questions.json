@@ -1,0 +1,82 @@
+[
+  {
+    "id": "technical-01",
+    "question": "What technical skills does the candidate have?",
+    "targetJobId": "all",
+    "expectedDocumentTypes": ["resume"],
+    "expectedJobIds": [],
+    "expectedConcepts": ["TypeScript", "PostgreSQL", "Node.js"]
+  },
+  {
+    "id": "backend-01",
+    "question": "Does the candidate have backend engineering experience relevant to this role?",
+    "targetJobId": "job_1",
+    "expectedDocumentTypes": ["resume", "job_description"],
+    "expectedJobIds": ["job_1"],
+    "expectedConcepts": ["TypeScript", "PostgreSQL", "API"]
+  },
+  {
+    "id": "frontend-01",
+    "question": "What frontend skills are required for this role?",
+    "targetJobId": "job_2",
+    "expectedDocumentTypes": ["job_description"],
+    "expectedJobIds": ["job_2"],
+    "expectedConcepts": ["React", "TypeScript", "accessibility"]
+  },
+  {
+    "id": "cloud-01",
+    "question": "What cloud skills are required for this role?",
+    "targetJobId": "job_3",
+    "expectedDocumentTypes": ["job_description"],
+    "expectedJobIds": ["job_3"],
+    "expectedConcepts": ["AWS", "Terraform", "cloud"]
+  },
+  {
+    "id": "ai-rag-01",
+    "question": "What AI or RAG-related skills are required for this job?",
+    "targetJobId": "job_4",
+    "expectedDocumentTypes": ["job_description"],
+    "expectedJobIds": ["job_4"],
+    "expectedConcepts": ["LangChain", "embeddings", "retrieval-augmented generation"]
+  },
+  {
+    "id": "leadership-01",
+    "question": "Does the candidate have leadership or mentoring experience?",
+    "targetJobId": "job_1",
+    "expectedDocumentTypes": ["resume"],
+    "expectedJobIds": ["job_1"],
+    "expectedConcepts": ["mentor"]
+  },
+  {
+    "id": "domain-01",
+    "question": "Does the candidate have relevant backend systems domain experience for this role?",
+    "targetJobId": "job_1",
+    "expectedDocumentTypes": ["resume", "job_description"],
+    "expectedJobIds": ["job_1"],
+    "expectedConcepts": ["backend", "API", "PostgreSQL"]
+  },
+  {
+    "id": "skill-gap-01",
+    "question": "What skills does the candidate appear to be missing for the cloud infrastructure role?",
+    "targetJobId": "job_3",
+    "expectedDocumentTypes": ["resume", "job_description"],
+    "expectedJobIds": ["job_3"],
+    "expectedConcepts": ["AWS", "Terraform", "Kubernetes"]
+  },
+  {
+    "id": "interview-prep-01",
+    "question": "What should the candidate prepare to discuss for a technical interview for this backend role?",
+    "targetJobId": "job_1",
+    "expectedDocumentTypes": ["resume", "job_description"],
+    "expectedJobIds": ["job_1"],
+    "expectedConcepts": ["TypeScript", "PostgreSQL", "API"]
+  },
+  {
+    "id": "all-jobs-01",
+    "question": "Which uploaded job requires cloud infrastructure experience?",
+    "targetJobId": "all",
+    "expectedDocumentTypes": ["job_description"],
+    "expectedJobIds": ["job_3"],
+    "expectedConcepts": ["AWS", "Terraform", "cloud"]
+  }
+]

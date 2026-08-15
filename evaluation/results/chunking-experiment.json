@@ -1,0 +1,32 @@
+{
+  "timestamp": "2026-08-15T08:31:16.644Z",
+  "datasetSize": 10,
+  "topK": 5,
+  "embeddingModel": "Xenova/all-MiniLM-L6-v2",
+  "configurations": [
+    {
+      "chunkSize": 500,
+      "chunkOverlap": 75,
+      "precisionAt5": 0.6266666666666667,
+      "recallAt5": 1,
+      "conceptHitRate": 1,
+      "averageLatencyMs": 3.8359999999999994
+    },
+    {
+      "chunkSize": 900,
+      "chunkOverlap": 120,
+      "precisionAt5": 0.64,
+      "recallAt5": 1,
+      "conceptHitRate": 1,
+      "averageLatencyMs": 3.029
+    },
+    {
+      "chunkSize": 1200,
+      "chunkOverlap": 150,
+      "precisionAt5": 0.64,
+      "recallAt5": 1,
+      "conceptHitRate": 1,
+      "averageLatencyMs": 2.8749999999999996
+    }
+  ]
+}

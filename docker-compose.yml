@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: cia-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-career_intelligence}
+      POSTGRES_USER: ${POSTGRES_USER:-cia}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-cia_dev_password}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - cia_postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-cia} -d ${POSTGRES_DB:-career_intelligence}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  cia_postgres_data:
