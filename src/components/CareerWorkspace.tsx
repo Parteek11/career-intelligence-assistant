@@ -470,7 +470,7 @@ export function CareerWorkspace() {
   return (
     <div className="space-y-10">
       {/* Documents */}
-      <section aria-labelledby="documents-heading" className="space-y-4">
+      <section aria-labelledby="documents-heading" className="space-y-8">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 id="documents-heading" className="text-lg font-semibold tracking-tight">
@@ -493,25 +493,27 @@ export function CareerWorkspace() {
         {clearError && <ErrorAlert message={clearError} />}
 
         <div className="space-y-6">
-          <div className="space-y-3">
-            <div>
+          <div className="mx-auto flex w-full flex-col gap-3 sm:w-[100%] sm:flex-row sm:items-center sm:gap-6">
+            <div className="shrink-0 sm:max-w-[14rem]">
               <h3 className="text-sm font-semibold">Candidate resume</h3>
               <p className="text-sm text-muted-foreground">
-                Upload one resume. Analysis and best-match both use this document.
+                Upload your resume here.
               </p>
             </div>
-            <DocumentCard
-              title="Resume"
-              icon={<FileText className="size-4" aria-hidden="true" />}
-              filename={resume.filename}
-              busy={resume.busy}
-              error={resume.error}
-              uploadLabel="Resume upload"
-              onUpload={handleResumeUpload}
-              onDelete={handleResumeDelete}
-              layout="banner"
-              uploadTone="resume"
-            />
+            <div className="min-w-0 flex-1">
+              <DocumentCard
+                title="Resume"
+                icon={<FileText className="size-4" aria-hidden="true" />}
+                filename={resume.filename}
+                busy={resume.busy}
+                error={resume.error}
+                uploadLabel="Resume upload"
+                onUpload={handleResumeUpload}
+                onDelete={handleResumeDelete}
+                layout="banner"
+                uploadTone="resume"
+              />
+            </div>
           </div>
 
           <div className="border-t border-border" aria-hidden="true" />
