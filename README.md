@@ -79,8 +79,6 @@ UI calls API routes only. Routes call services. Repositories own SQL. Evaluation
 
 **Generation.** The prompt may use only retrieved evidence, must not invent experience, must say “insufficient evidence” when unsupported, and must not treat a missed retrieval as proof a skill is absent. Output is validated JSON. Sources (`filename`, type, job, chunk index, similarity) are attached from retrieval, not from the LLM.
 
-**Observability.** Server-side JSON logs for ingest, embed, retrieve, generate, and best-match (durations, `queryId`, chunk ids, scores). No document text, prompts, answers, or API keys.
-
 ## 5. Key Technical Decisions
 
 **pgvector vs Chroma.** Four job slots, cascade deletes, and “resume + Job 2” filters are relational. pgvector keeps vectors next to that metadata. Chroma is a valid embedding store, but would need a second sync path for slot constraints.

@@ -45,12 +45,6 @@ export async function persistIngestedChunks(
     input.pool,
   );
 
-  console.info("chunk_persistence.complete", {
-    documentId: summary.documentId,
-    documentType: input.metadata.documentType,
-    insertedCount: summary.insertedCount,
-  });
-
   return summary;
 }
 

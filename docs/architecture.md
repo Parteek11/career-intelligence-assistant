@@ -9,7 +9,6 @@ The README is the full technical write-up. This file is the layer map, domain mo
 - **UI** (`src/app`, `src/components`): `CareerWorkspace` is a client component. It calls API routes with `fetch`. It does not import database, RAG, or generation modules.
 - **API routes** (`src/app/api`): `GET /api/health`, `GET/POST/DELETE /api/resume`, `GET /api/jobs`, `POST/DELETE /api/jobs/:slot`, `POST /api/clear`, `POST /api/analyze`, `POST /api/best-match`. Handlers call services. They do not contain SQL or prompt text.
 - **Configuration** (`src/lib/config.ts`): `DATABASE_URL` for the server-side pool.
-- **Observability** (`src/lib/observability/logger.ts`): JSON logs to stdout. Replaceable sink. No browser logging.
 - **Database** (`src/db`): pool, SQL migrations, row types, repositories. `document-chunks.ts` owns `<=>` search. No embedding code here.
 - **Domain types** (`src/types/domain.ts`): Resume, Job, Document, DocumentChunk, `JobSlot`.
 - **RAG ingestion** (`src/rag`): PDF/text loaders, normalization, `RecursiveCharacterTextSplitter`, chunk metadata.

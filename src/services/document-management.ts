@@ -107,7 +107,6 @@ export async function uploadJobDescription(
     },
     file,
     dependencies,
-    slot,
   );
 
   return { ...summary, jobId: job.id };
@@ -139,12 +138,10 @@ async function ingestAndPersist(
   },
   file: UploadFile,
   dependencies: DocumentManagementDependencies,
-  jobSlot?: number | null,
 ): Promise<UploadSummary> {
   const { chunks } = await ingestUploadedDocument({
     file: { buffer: file.buffer, filename: file.filename, mimeType: file.mimeType },
     metadata,
-    jobSlot,
     chunking: dependencies.chunking,
   });
 

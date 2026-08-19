@@ -5,7 +5,6 @@ import { getDefaultAnalysisProvider } from "@/generation/groq-client";
 import { parseAnalysisResponse } from "@/generation/parse-analysis";
 import { buildGroundedPrompt } from "@/generation/prompt";
 import type { AnalysisLLMProvider, CareerAnalysis, CareerAnalysisSource } from "@/generation/types";
-import { createQueryId, logGenerationEvent, startTimer } from "@/lib/observability/logger";
 import {
   retrieveCareerEvidence,
   type CareerEvidenceItem,
@@ -17,7 +16,6 @@ export type AnalyzeCareerFitInput = {
   question: string;
   targetJobId: RetrievalTarget;
   topK?: number;
-  queryId?: string;
 };
 
 export type AnalyzeCareerFitDependencies = RetrieveCareerEvidenceDependencies & {
@@ -34,13 +32,11 @@ export async function analyzeCareerFit(
   input: AnalyzeCareerFitInput,
   dependencies: AnalyzeCareerFitDependencies = {},
 ): Promise<CareerAnalysis> {
-  const queryId = input.queryId ?? createQueryId();
   const evidence = await retrieveCareerEvidence(
     {
       query: input.question,
       targetJobId: input.targetJobId,
       topK: input.topK,
-      queryId,
     },
     dependencies,
   );
@@ -53,29 +49,13 @@ export async function analyzeCareerFit(
 
   const prompt = buildGroundedPrompt(input.question, evidence);
   const llmProvider = dependencies.llmProvider ?? getDefaultAnalysisProvider();
-  const elapsed = startTimer();
-  let success = false;
+  const rawResponse = await callProvider(llmProvider, prompt);
+  const modelOutput = parseAnalysisResponse(rawResponse);
 
-  try {
-    const rawResponse = await callProvider(llmProvider, prompt);
-    const modelOutput = parseAnalysisResponse(rawResponse);
-    success = true;
-
-    return {
-      ...modelOutput,
-      sources: evidence.map(toSource),
-    };
-  } finally {
-    logGenerationEvent({
-      queryId,
-      selectedJob: input.targetJobId,
-      retrievedResultCount: evidence.length,
-      durationMs: elapsed(),
-      success,
-      model: llmProvider.model,
-      ...llmProvider.lastUsage,
-    });
-  }
+  return {
+    ...modelOutput,
+    sources: evidence.map(toSource),
+  };
 }
 
 async function callProvider(

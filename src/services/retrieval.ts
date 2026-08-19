@@ -6,7 +6,6 @@ import {
   type VectorSearchFilters,
   type VectorSearchResult,
 } from "@/db/repositories/document-chunks";
-import { createQueryId, logEvent, startTimer } from "@/lib/observability/logger";
 import { getDefaultEmbeddingProvider } from "@/rag/embedding/provider";
 import type { EmbeddingProvider } from "@/rag/embedding/types";
 import type { DocumentType } from "@/types/domain";
@@ -25,7 +24,6 @@ export type RetrieveCareerEvidenceInput = {
   query: string;
   targetJobId: RetrievalTarget;
   topK?: number;
-  queryId?: string;
 };
 
 export type CareerEvidenceItem = {
@@ -72,9 +70,6 @@ export async function retrieveCareerEvidence(
     throw new RetrievalError("topK must be a positive number");
   }
 
-  const queryId = input.queryId ?? createQueryId();
-  const elapsed = startTimer();
-
   const provider = dependencies.provider ?? getDefaultEmbeddingProvider();
   const [queryEmbedding] = await provider.embed([query]);
 
@@ -90,17 +85,6 @@ export async function retrieveCareerEvidence(
   ]);
 
   const merged = mergeBySimilarity(resumeMatches, jobMatches, topK);
-
-  logEvent({
-    operation: "retrieval",
-    queryId,
-    targetJobId: input.targetJobId,
-    topK,
-    durationMs: elapsed(),
-    resultCount: merged.length,
-    retrievedChunkIds: merged.map((row) => row.id),
-    similarityScores: merged.map((row) => Number(row.similarity.toFixed(4))),
-  });
 
   return merged.map(toEvidenceItem);
 }

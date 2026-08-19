@@ -1,5 +1,4 @@
 import type { Document } from "@langchain/core/documents";
-import { logEvent } from "@/lib/observability/logger";
 import type { DocumentType } from "@/types/domain";
 import type { IngestionStats } from "@/rag/types";
 
@@ -22,21 +21,4 @@ export function buildIngestionStats(input: {
     minChunkLength: chunkCount === 0 ? 0 : Math.min(...lengths),
     maxChunkLength: chunkCount === 0 ? 0 : Math.max(...lengths),
   };
-}
-
-export function logIngestionStats(
-  stats: IngestionStats,
-  extra: { durationMs?: number; jobId?: string | null; jobSlot?: number | null } = {},
-): void {
-  logEvent({
-    operation: "ingestion",
-    documentType: stats.documentType,
-    jobId: extra.jobId ?? null,
-    jobSlot: extra.jobSlot ?? null,
-    filename: stats.sourceFilename,
-    durationMs: extra.durationMs,
-    pageCount: stats.pageCount,
-    chunkCount: stats.chunkCount,
-    averageChunkLength: stats.averageChunkLength,
-  });
 }

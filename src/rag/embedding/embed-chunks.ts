@@ -1,5 +1,4 @@
 import type { Document } from "@langchain/core/documents";
-import { logEvent, startTimer } from "@/lib/observability/logger";
 import { IngestionError } from "@/rag/errors";
 import { getDefaultEmbeddingProvider } from "@/rag/embedding/provider";
 import type { EmbeddedChunk, EmbeddingProvider } from "@/rag/embedding/types";
@@ -13,10 +12,7 @@ export async function embedChunks(
   chunks: Document[],
   provider: EmbeddingProvider = getDefaultEmbeddingProvider(),
 ): Promise<EmbeddedChunk[]> {
-  const elapsed = startTimer();
-
   if (chunks.length === 0) {
-    logEmbedding(provider, 0, elapsed());
     return [];
   }
 
@@ -29,23 +25,11 @@ export async function embedChunks(
     );
   }
 
-  const embedded = chunks.map((chunk, index) => ({
+  return chunks.map((chunk, index) => ({
     embedding: vectors[index],
     metadata: chunk.metadata,
     chunkIndex: readChunkIndex(chunk, index),
   }));
-
-  logEmbedding(provider, chunks.length, elapsed());
-  return embedded;
-}
-
-function logEmbedding(provider: EmbeddingProvider, chunkCount: number, durationMs: number): void {
-  logEvent({
-    operation: "embedding",
-    model: provider.model ?? "unknown",
-    chunkCount,
-    durationMs,
-  });
 }
 
 function readChunkIndex(chunk: Document, fallback: number): number {

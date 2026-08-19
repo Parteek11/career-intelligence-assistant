@@ -8,7 +8,6 @@ import { getDefaultAnalysisProvider } from "@/generation/groq-client";
 import { parseBestMatchResponse } from "@/generation/parse-best-match";
 import { calculateWeightedScore, DEFAULT_SCORE_WEIGHTS } from "@/generation/scoring";
 import type { AnalysisLLMProvider, CareerAnalysisSource, GroundedPrompt } from "@/generation/types";
-import { createQueryId, logEvent, logGenerationEvent, startTimer } from "@/lib/observability/logger";
 import {
   retrieveCareerEvidence,
   type CareerEvidenceItem,
@@ -23,7 +22,6 @@ export type FindBestMatchDependencies = RetrieveCareerEvidenceDependencies & {
   weights?: Record<ScoreCategory, number>;
   query?: string;
   topK?: number;
-  queryId?: string;
 };
 
 /**
@@ -51,16 +49,12 @@ export async function findBestMatch(
   const query = dependencies.query ?? DEFAULT_BEST_MATCH_QUERY;
   const llmProvider = dependencies.llmProvider ?? getDefaultAnalysisProvider();
   const weights = dependencies.weights ?? DEFAULT_SCORE_WEIGHTS;
-  const queryId = dependencies.queryId ?? createQueryId();
-  const totalElapsed = startTimer();
 
   const results: BestMatchResult[] = [];
-  const perJobDurationMs: { jobId: string; jobSlot: number; durationMs: number }[] = [];
 
   for (const job of jobs) {
-    const jobElapsed = startTimer();
     const evidence = await retrieveCareerEvidence(
-      { query, targetJobId: job.id, topK: dependencies.topK, queryId },
+      { query, targetJobId: job.id, topK: dependencies.topK },
       dependencies,
     );
 
@@ -74,57 +68,20 @@ export async function findBestMatch(
     }
 
     const prompt = buildBestMatchPrompt(evidence);
-    const generationElapsed = startTimer();
-    let success = false;
+    const rawResponse = await callProvider(llmProvider, prompt);
+    const modelOutput = parseBestMatchResponse(rawResponse);
+    const score = calculateWeightedScore(modelOutput.categoryScores, weights);
 
-    try {
-      const rawResponse = await callProvider(llmProvider, prompt);
-      const modelOutput = parseBestMatchResponse(rawResponse);
-      const score = calculateWeightedScore(modelOutput.categoryScores, weights);
-      success = true;
-
-      results.push({
-        ...modelOutput,
-        jobId: job.id,
-        jobSlot: job.slot,
-        score,
-        sources: evidence.map(toSource),
-      });
-    } finally {
-      logGenerationEvent({
-        queryId,
-        selectedJob: job.id,
-        retrievedResultCount: evidence.length,
-        durationMs: generationElapsed(),
-        success,
-        model: llmProvider.model,
-        ...llmProvider.lastUsage,
-      });
-    }
-
-    perJobDurationMs.push({
+    results.push({
+      ...modelOutput,
       jobId: job.id,
       jobSlot: job.slot,
-      durationMs: jobElapsed(),
+      score,
+      sources: evidence.map(toSource),
     });
   }
 
-  const ranked = results.sort((a, b) => b.score - a.score);
-
-  logEvent({
-    operation: "best_match",
-    queryId,
-    jobsEvaluated: ranked.length,
-    perJobDurationMs,
-    finalJobScores: ranked.map((result) => ({
-      jobId: result.jobId,
-      jobSlot: result.jobSlot,
-      score: result.score,
-    })),
-    durationMs: totalElapsed(),
-  });
-
-  return ranked;
+  return results.sort((a, b) => b.score - a.score);
 }
 
 async function callProvider(
