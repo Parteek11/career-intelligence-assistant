@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getResume } from "@/db/repositories/resumes";
+import { getResume } from "@/db/queries";
 import { deleteResume, uploadResume } from "@/services/documents";
 
 export const runtime = "nodejs";

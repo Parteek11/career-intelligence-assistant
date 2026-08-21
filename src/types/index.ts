@@ -1,10 +1,2 @@
-export type {
-  Document,
-  DocumentChunk,
-  DocumentChunkMetadata,
-  DocumentType,
-  Job,
-  JobSlot,
-  Resume,
-} from "./domain";
-export { DOCUMENT_TYPES, EMBEDDING_DIMENSIONS, JOB_SLOTS } from "./domain";
+export type { DocumentType, JobSlot } from "./domain";
+export { EMBEDDING_DIMENSIONS, JOB_SLOTS, isJobSlot } from "./domain";

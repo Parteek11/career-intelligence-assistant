@@ -56,13 +56,13 @@ Job filters run in the same SQL as vector search so a Job 2 question cannot retu
 ## Project layout
 
 ```
-src/app/api          HTTP routes
-src/components       UI
-src/rag              ingest + embed
-src/generation       ChatGroq, prompts, JSON parse
-src/services         upload, retrieve, analyze, best match
-src/db               pool, migrations, SQL
-evaluation/          golden questions + retrieval metrics
+src/app/api                 HTTP routes
+src/components              CareerWorkspace + workspace/* UI pieces
+src/rag                     ingest + embed
+src/generation              ChatGroq, prompts, JSON parse
+src/services                upload, retrieve, analyze, best match
+src/db                      pool.ts, queries.ts, migrations/
+evaluation/                 golden questions + retrieval metrics
 ```
 
 ## Evaluation

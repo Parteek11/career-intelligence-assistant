@@ -4,12 +4,12 @@ Single-user Next.js App Router MVP. PostgreSQL + pgvector is the only datastore.
 
 ## Layers
 
-- **UI** (`src/app`, `src/components`): `CareerWorkspace` calls API routes with `fetch`. It does not import database or RAG modules.
+- **UI** (`src/app`, `src/components`): `CareerWorkspace` holds fetch/state. Documents, analysis form, and results are separate components. The UI does not import database or RAG modules.
 - **API** (`src/app/api`): health, resume, jobs, clear, analyze, best-match. Handlers call services.
 - **Services** (`src/services`): upload/ingest, retrieval, career analysis + best match.
 - **RAG** (`src/rag`): LangChain `PDFLoader` / text load, `RecursiveCharacterTextSplitter`, `HuggingFaceTransformersEmbeddings`.
 - **Generation** (`src/generation`): `ChatGroq`, grounded prompts, JSON parsers, best-match weights.
-- **Database** (`src/db`): `pg` pool, SQL migration, repositories. Vector search uses `<=>` in SQL.
+- **Database** (`src/db`): `pool.ts` (connection), `queries.ts` (all SQL), `migrations/` (schema). Vector search uses `<=>` in SQL.
 
 Postgres 16 + pgvector runs in Docker Compose.
 

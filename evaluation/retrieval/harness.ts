@@ -3,7 +3,7 @@ import { dirname, join } from "node:path";
 import { performance } from "node:perf_hooks";
 import { fileURLToPath } from "node:url";
 
-import { getJobBySlot } from "@/db/repositories/jobs";
+import { getJobBySlot } from "@/db/queries";
 import { uploadJobDescription, uploadResume } from "@/services/documents";
 import { retrieveCareerEvidence } from "@/services/retrieval";
 

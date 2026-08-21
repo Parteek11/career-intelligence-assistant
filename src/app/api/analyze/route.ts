@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getJobBySlot } from "@/db/repositories/jobs";
+import { getJobBySlot } from "@/db/queries";
 import { analyzeCareerFit } from "@/services/analysis";
 import { isJobSlot } from "@/types/domain";
 

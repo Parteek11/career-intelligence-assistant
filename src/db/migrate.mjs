@@ -14,34 +14,21 @@ export async function applyMigrations(pool) {
     )
   `);
 
-  const files = (await readdir(migrationsDir))
-    .filter((name) => name.endsWith(".sql"))
-    .sort();
+  const files = (await readdir(migrationsDir)).filter((name) => name.endsWith(".sql")).sort();
 
   for (const file of files) {
-    const applied = await pool.query(
-      "SELECT 1 FROM schema_migrations WHERE id = $1",
-      [file],
-    );
-
-    if ((applied.rowCount ?? 0) > 0) {
-      continue;
-    }
+    const alreadyApplied = await pool.query("SELECT 1 FROM schema_migrations WHERE id = $1", [file]);
+    if ((alreadyApplied.rowCount ?? 0) > 0) continue;
 
     const sql = await readFile(join(migrationsDir, file), "utf8");
     const client = await pool.connect();
-
     try {
       await client.query("BEGIN");
       await client.query(sql);
       await client.query("INSERT INTO schema_migrations (id) VALUES ($1)", [file]);
       await client.query("COMMIT");
     } catch (error) {
-      try {
-        await client.query("ROLLBACK");
-      } catch {
-        // The transaction may already be aborted or closed.
-      }
+      await client.query("ROLLBACK").catch(() => undefined);
       throw error;
     } finally {
       client.release();
@@ -49,41 +36,28 @@ export async function applyMigrations(pool) {
   }
 }
 
-function loadProjectEnv() {
+function loadEnv() {
   const envPath = join(process.cwd(), ".env");
-  if (!existsSync(envPath)) {
-    return;
-  }
+  if (!existsSync(envPath)) return;
 
   for (const line of readFileSync(envPath, "utf8").split("\n")) {
     const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith("#")) {
-      continue;
-    }
-
+    if (!trimmed || trimmed.startsWith("#")) continue;
     const separator = trimmed.indexOf("=");
-    if (separator === -1) {
-      continue;
-    }
-
+    if (separator === -1) continue;
     const key = trimmed.slice(0, separator);
     const value = trimmed.slice(separator + 1);
-    if (process.env[key] === undefined) {
-      process.env[key] = value;
-    }
+    if (process.env[key] === undefined) process.env[key] = value;
   }
 }
 
-async function runCli() {
-  loadProjectEnv();
-
-  const databaseUrl = process.env.DATABASE_URL;
-  if (!databaseUrl) {
+async function main() {
+  loadEnv();
+  if (!process.env.DATABASE_URL) {
     throw new Error("DATABASE_URL is not set. Copy .env.example to .env first.");
   }
 
-  const pool = new Pool({ connectionString: databaseUrl });
-
+  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
   try {
     await applyMigrations(pool);
     console.log("Migrations applied.");
@@ -93,7 +67,7 @@ async function runCli() {
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
-  runCli().catch((error) => {
+  main().catch((error) => {
     console.error(error);
     process.exitCode = 1;
   });

@@ -1,8 +1,14 @@
 import type { Document } from "@langchain/core/documents";
-import { replaceDocumentChunks } from "@/db/repositories/document-chunks";
-import { upsertJobDocument, upsertResumeDocument } from "@/db/repositories/documents";
-import { deleteAllJobs, deleteJobBySlot, upsertJobForSlot } from "@/db/repositories/jobs";
-import { deleteResume as deleteResumeRow, upsertResume } from "@/db/repositories/resumes";
+import {
+  deleteAllJobs,
+  deleteJobBySlot,
+  deleteResume as deleteResumeRow,
+  replaceDocumentChunks,
+  upsertJobDocument,
+  upsertJobForSlot,
+  upsertResume,
+  upsertResumeDocument,
+} from "@/db/queries";
 import { embeddings } from "@/rag/embed";
 import { ingestFile, type IngestionFile } from "@/rag/ingest";
 import { isJobSlot, type JobSlot } from "@/types/domain";

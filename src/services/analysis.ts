@@ -1,4 +1,4 @@
-import { listJobs } from "@/db/repositories/jobs";
+import { listJobs } from "@/db/queries";
 import { completeJson } from "@/generation/llm";
 import { parseAnalysisResponse, parseBestMatchResponse } from "@/generation/parse";
 import { buildAnalysisPrompt, buildBestMatchPrompt } from "@/generation/prompt";

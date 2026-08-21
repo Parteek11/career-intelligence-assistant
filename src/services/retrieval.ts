@@ -1,4 +1,4 @@
-import { searchSimilarChunks } from "@/db/repositories/document-chunks";
+import { searchSimilarChunks } from "@/db/queries";
 import { embeddings } from "@/rag/embed";
 import type { DocumentType } from "@/types/domain";
 
@@ -13,7 +13,7 @@ export type CareerEvidenceItem = {
   chunkIndex: number;
 };
 
-const DEFAULT_TOP_K = 5;
+const DEFAULT_TOP_K = 10;
 
 export async function retrieveCareerEvidence(input: {
   query: string;
