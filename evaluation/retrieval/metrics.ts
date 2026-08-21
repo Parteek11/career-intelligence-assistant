@@ -1,12 +1,6 @@
 import type { RetrievedItemForEval } from "./types";
 
-/**
- * Pure, dependency-free metric functions for retrieval evaluation. No
- * database, embedding, or HTTP access — every function here is a plain
- * transformation of retrieved items + expectations into a number, which is
- * what makes them straightforward to unit test in isolation from Postgres
- * and the LLM.
- */
+/** Metric helpers for the retrieval eval harness. */
 
 /**
  * A retrieved chunk counts as relevant to a question when its document

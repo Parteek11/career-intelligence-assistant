@@ -1,3 +1,0 @@
-Job 2: Senior Backend Engineer
-
-We are hiring a senior backend engineer to design APIs, data models, and document processing pipelines. You will work with TypeScript, PostgreSQL, and search systems. Experience with RAG is helpful but not required. You will review designs, mentor teammates, and improve reliability.

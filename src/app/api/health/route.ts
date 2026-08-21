@@ -1,12 +1,17 @@
 import { NextResponse } from "next/server";
-import { getHealth } from "@/lib/health";
+import { getPool } from "@/db/pool";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const health = await getHealth();
-  const httpStatus = health.status === "ok" ? 200 : 503;
-
-  return NextResponse.json(health, { status: httpStatus });
+  try {
+    await getPool().query("SELECT 1");
+    return NextResponse.json({ status: "ok", application: "ok", database: "ok" });
+  } catch {
+    return NextResponse.json(
+      { status: "degraded", application: "ok", database: "error" },
+      { status: 503 },
+    );
+  }
 }

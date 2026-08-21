@@ -1,19 +1,4 @@
-import type { DocumentType } from "@/types/domain";
-
-/**
- * The shape the LLM must return, before source metadata is attached.
- * Sources are never trusted from the model — they are built directly from
- * the retrieved evidence (see career-analysis.ts) so citations cannot be
- * hallucinated or mismatched.
- */
-export type AnalysisModelOutput = {
-  answer: string;
-  strengths: string[];
-  skillGaps: string[];
-  experienceAlignment: string;
-  interviewPreparation: string[];
-  recommendations: string[];
-};
+import type { DocumentType, JobSlot } from "@/types/domain";
 
 export type CareerAnalysisSource = {
   filename: string | null;
@@ -23,23 +8,52 @@ export type CareerAnalysisSource = {
   similarity: number;
 };
 
-export type CareerAnalysis = AnalysisModelOutput & {
+export type CareerAnalysis = {
+  answer: string;
+  strengths: string[];
+  skillGaps: string[];
+  experienceAlignment: string;
+  interviewPreparation: string[];
+  recommendations: string[];
   sources: CareerAnalysisSource[];
 };
 
-export type GroundedPrompt = {
-  system: string;
-  user: string;
+export const SCORE_CATEGORIES = [
+  "technicalSkillAlignment",
+  "experienceAlignment",
+  "domainAlignment",
+  "leadershipSeniorityAlignment",
+] as const;
+
+export type ScoreCategory = (typeof SCORE_CATEGORIES)[number];
+export type CategoryScores = Record<ScoreCategory, number>;
+
+export type BestMatchResult = {
+  categoryScores: CategoryScores;
+  strengths: string[];
+  skillGaps: string[];
+  reasoning: string;
+  jobId: string;
+  jobSlot: JobSlot;
+  score: number;
+  sources: CareerAnalysisSource[];
 };
 
-export type TokenUsage = {
-  promptTokens?: number;
-  completionTokens?: number;
-  totalTokens?: number;
+export const DEFAULT_SCORE_WEIGHTS: Record<ScoreCategory, number> = {
+  technicalSkillAlignment: 0.4,
+  experienceAlignment: 0.3,
+  domainAlignment: 0.2,
+  leadershipSeniorityAlignment: 0.1,
 };
 
-export interface AnalysisLLMProvider {
-  generate(prompt: GroundedPrompt): Promise<string>;
-  readonly model?: string;
-  readonly lastUsage?: TokenUsage | null;
+export function calculateWeightedScore(categoryScores: CategoryScores): number {
+  const totalWeight = SCORE_CATEGORIES.reduce(
+    (sum, category) => sum + DEFAULT_SCORE_WEIGHTS[category],
+    0,
+  );
+  const weightedSum = SCORE_CATEGORIES.reduce(
+    (sum, category) => sum + categoryScores[category] * DEFAULT_SCORE_WEIGHTS[category],
+    0,
+  );
+  return Math.round((weightedSum / totalWeight) * 10) / 10;
 }

@@ -1,4 +1,3 @@
-export type { CheckStatus, HealthResponse, OverallStatus } from "./health";
 export type {
   Document,
   DocumentChunk,

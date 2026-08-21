@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { clearAll } from "@/services/document-management";
+import { clearAll } from "@/services/documents";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";

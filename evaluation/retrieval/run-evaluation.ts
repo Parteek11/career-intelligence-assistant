@@ -1,25 +1,13 @@
-// Retrieval evaluation runner.
-//
-// Seeds a fixed golden corpus (one resume + four job descriptions), runs
-// every golden question through the REAL, unmodified `retrieveCareerEvidence`
-// (the same function production code calls), computes deterministic
-// metrics, and writes a JSON report under evaluation/results/.
-//
-// This intentionally overwrites whatever resume/jobs are currently
-// uploaded in your local database, and clears them again when it
-// finishes. See README "Evaluation" before running against data you care
-// about.
-//
-// Requires PostgreSQL running/migrated: docker compose up -d && npm run db:migrate
-// Run with: npm run eval:retrieval
+// Seeds a golden resume + 4 jobs, runs questions through retrieveCareerEvidence,
+// writes evaluation/results/latest.json, then clears the seeded data.
 
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { getPool } from "@/db/pool";
-import { DEFAULT_CHUNK_OVERLAP, DEFAULT_CHUNK_SIZE } from "@/rag/types";
-import { clearAll } from "@/services/document-management";
+import { DEFAULT_CHUNK_OVERLAP, DEFAULT_CHUNK_SIZE } from "@/rag/ingest";
+import { clearAll } from "@/services/documents";
 
 import {
   EMBEDDING_MODEL_NAME,
@@ -31,7 +19,7 @@ import {
   runDataset,
   seedGoldenCorpus,
 } from "./harness";
-import type { EvaluationConfig, EvaluationReport } from "./types";
+import type { EvaluationReport } from "./types";
 
 const currentDir = dirname(fileURLToPath(import.meta.url));
 const resultsDir = join(currentDir, "../results");
@@ -90,7 +78,7 @@ async function main(): Promise<void> {
 
   const perQuestion = await runDataset(dataset, corpus);
 
-  const configuration: EvaluationConfig = {
+  const configuration = {
     topK: TOP_K,
     embeddingModel: EMBEDDING_MODEL_NAME,
     chunkSize: DEFAULT_CHUNK_SIZE,

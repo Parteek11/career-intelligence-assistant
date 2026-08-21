@@ -1,23 +1,16 @@
-import "server-only";
-
 import { Pool } from "pg";
-import { getDatabaseUrl } from "@/lib/config";
 
-const globalForPg = globalThis as unknown as {
-  pgPool?: Pool;
-};
+const globalForPg = globalThis as unknown as { pgPool?: Pool };
 
 export function getPool(): Pool {
+  const connectionString = process.env.DATABASE_URL;
+  if (!connectionString) {
+    throw new Error("DATABASE_URL is not set");
+  }
+
   if (!globalForPg.pgPool) {
-    globalForPg.pgPool = new Pool({
-      connectionString: getDatabaseUrl(),
-      max: 10,
-    });
+    globalForPg.pgPool = new Pool({ connectionString, max: 10 });
   }
 
   return globalForPg.pgPool;
-}
-
-export async function pingDatabase(): Promise<void> {
-  await getPool().query("SELECT 1");
 }

@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
     "pg",
     "pdf-parse",
     "@langchain/community",
+    "@langchain/groq",
     "@huggingface/transformers",
   ],
 };

@@ -1,9 +1,4 @@
-import "server-only";
-
-import type { Pool, PoolClient } from "pg";
 import { getPool } from "@/db/pool";
-import { DatabaseError } from "@/db/errors";
-import { toVectorLiteral } from "@/db/vector";
 import { EMBEDDING_DIMENSIONS, type DocumentType } from "@/types/domain";
 
 export type ChunkToPersist = {
@@ -13,37 +8,38 @@ export type ChunkToPersist = {
   metadata: Record<string, unknown>;
 };
 
-export type PersistedChunksSummary = {
+export type VectorSearchResult = {
+  id: string;
   documentId: string;
-  insertedCount: number;
+  jobId: string | null;
+  documentType: DocumentType;
+  chunkIndex: number;
+  content: string;
+  metadata: Record<string, unknown>;
+  distance: number;
+  similarity: number;
 };
 
-/**
- * Replaces all chunks for a document in a single transaction: delete then
- * insert. Re-ingesting a document (new upload, changed chunking config)
- * therefore never leaves duplicate or stale chunks behind, and a failed
- * insert leaves the previous chunks untouched.
- */
+function toVectorLiteral(embedding: number[]): string {
+  return `[${embedding.join(",")}]`;
+}
+
 export async function replaceDocumentChunks(
   documentId: string,
   chunks: ChunkToPersist[],
-  pool: Pool = getPool(),
-): Promise<PersistedChunksSummary> {
+): Promise<number> {
   for (const chunk of chunks) {
     if (chunk.embedding.length !== EMBEDDING_DIMENSIONS) {
-      throw new DatabaseError(
+      throw new Error(
         `Chunk ${chunk.chunkIndex} has a ${chunk.embedding.length}-dimensional embedding, expected ${EMBEDDING_DIMENSIONS}`,
       );
     }
   }
 
-  const client = await pool.connect();
-
+  const client = await getPool().connect();
   try {
     await client.query("BEGIN");
-    await client.query("DELETE FROM document_chunks WHERE document_id = $1", [
-      documentId,
-    ]);
+    await client.query("DELETE FROM document_chunks WHERE document_id = $1", [documentId]);
 
     for (const chunk of chunks) {
       await client.query(
@@ -60,93 +56,52 @@ export async function replaceDocumentChunks(
     }
 
     await client.query("COMMIT");
-    return { documentId, insertedCount: chunks.length };
+    return chunks.length;
   } catch (error) {
-    await rollbackQuietly(client);
+    await client.query("ROLLBACK").catch(() => undefined);
     throw error;
   } finally {
     client.release();
   }
 }
 
-async function rollbackQuietly(client: PoolClient): Promise<void> {
-  try {
-    await client.query("ROLLBACK");
-  } catch {
-    // The transaction may already be aborted or closed.
-  }
-}
-
-export type VectorSearchFilters = {
-  jobId?: string | null;
-  documentType?: DocumentType;
-  documentId?: string;
-};
-
-export type VectorSearchOptions = {
-  topK?: number;
-  filters?: VectorSearchFilters;
-};
-
-export type VectorSearchResult = {
-  id: string;
-  documentId: string;
-  jobId: string | null;
-  documentType: DocumentType;
-  chunkIndex: number;
-  content: string;
-  metadata: Record<string, unknown>;
-  /** Cosine distance from pgvector's `<=>` operator. 0 = identical direction, 2 = opposite. */
-  distance: number;
-  /** `1 - distance`, i.e. cosine similarity. 1 = identical direction. */
-  similarity: number;
-};
-
-type VectorSearchRow = {
-  id: string;
-  document_id: string;
-  job_id: string | null;
-  document_type: DocumentType;
-  chunk_index: number;
-  content: string;
-  metadata: Record<string, unknown>;
-  distance: number;
-};
-
-/**
- * Nearest-neighbor search using pgvector's cosine-distance operator (`<=>`)
- * directly in SQL. Ranking and distance computation happen in Postgres;
- * only the top `topK` rows are ever sent back to Node.
- */
 export async function searchSimilarChunks(
   queryEmbedding: number[],
-  options: VectorSearchOptions = {},
-  pool: Pool = getPool(),
+  options: {
+    topK?: number;
+    filters?: { jobId?: string | null; documentType?: DocumentType };
+  } = {},
 ): Promise<VectorSearchResult[]> {
   if (queryEmbedding.length !== EMBEDDING_DIMENSIONS) {
-    throw new DatabaseError(
+    throw new Error(
       `Query embedding has ${queryEmbedding.length} dimensions, expected ${EMBEDDING_DIMENSIONS}`,
     );
   }
 
   const topK = options.topK ?? 5;
   const filters = options.filters ?? {};
-
-  const result = await pool.query<VectorSearchRow>(
+  const result = await getPool().query<{
+    id: string;
+    document_id: string;
+    job_id: string | null;
+    document_type: DocumentType;
+    chunk_index: number;
+    content: string;
+    metadata: Record<string, unknown>;
+    distance: number;
+  }>(
     `SELECT id, document_id, job_id, document_type, chunk_index, content, metadata,
             embedding <=> $1::vector AS distance
        FROM document_chunks
       WHERE embedding IS NOT NULL
         AND ($2::uuid IS NULL OR job_id = $2)
         AND ($3::text IS NULL OR document_type = $3)
-        AND ($4::uuid IS NULL OR document_id = $4)
       ORDER BY embedding <=> $1::vector
-      LIMIT $5`,
+      LIMIT $4`,
     [
       toVectorLiteral(queryEmbedding),
       filters.jobId ?? null,
       filters.documentType ?? null,
-      filters.documentId ?? null,
       topK,
     ],
   );

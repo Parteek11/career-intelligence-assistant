@@ -8,7 +8,7 @@ export function isJobSlot(value: number): value is JobSlot {
 export const DOCUMENT_TYPES = ["resume", "job_description"] as const;
 export type DocumentType = (typeof DOCUMENT_TYPES)[number];
 
-/** Dimension expected by all-MiniLM-L6-v2. The column is prepared, not populated. */
+/** Dimension of Xenova/all-MiniLM-L6-v2 embeddings. */
 export const EMBEDDING_DIMENSIONS = 384 as const;
 
 export type Resume = {

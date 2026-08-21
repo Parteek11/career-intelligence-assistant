@@ -17,8 +17,7 @@ import {
   Trophy,
   Upload,
 } from "lucide-react";
-import type { BestMatchResult } from "@/generation/best-match-types";
-import type { CareerAnalysis } from "@/generation/types";
+import type { BestMatchResult, CareerAnalysis } from "@/generation/types";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
