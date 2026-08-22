@@ -11,7 +11,9 @@ import {
 import type { JobSlotState } from "@/components/workspace/DocumentsSection";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import type { BestMatchResult, CareerAnalysis } from "@/generation/types";
+import type { BestMatchResult, CareerAnalysis, CareerAskJobAnswer, CareerAskResult } from "@/generation/types";
+import { splitJobAnswersFromText } from "@/generation/job-answers";
+import { INVALID_QUESTION_MESSAGE } from "@/generation/question";
 import { JOB_SLOTS, type JobSlot } from "@/types/domain";
 
 function formatCategoryLabel(category: string): string {
@@ -30,23 +32,98 @@ function describeSource(
   return slot ? `Job ${slot}` : "job (unknown slot)";
 }
 
+function SourceList({
+  sources,
+  jobs,
+}: {
+  sources: CareerAnalysis["sources"];
+  jobs: Record<JobSlot, JobSlotState>;
+}) {
+  return (
+    <div className="space-y-2">
+      <h3 className="text-sm font-semibold">Sources</h3>
+      <ul className="space-y-1.5">
+        {sources.map((source, index) => (
+          <li
+            key={index}
+            className="rounded-md border border-border bg-muted/40 px-2.5 py-2 text-xs text-muted-foreground"
+          >
+            filename: {source.filename ?? "unknown"} — documentType: {source.documentType} —
+            job: {describeSource(source, jobs)} — chunkIndex: {source.chunkIndex} — similarity:{" "}
+            {source.similarity.toFixed(3)}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function jobAnswersForDisplay(result: CareerAskResult): CareerAskJobAnswer[] {
+  if (result.jobAnswers?.length) return result.jobAnswers;
+  return splitJobAnswersFromText(result.answer ?? "");
+}
+
+function AskAnswerBody({ result }: { result: CareerAskResult }) {
+  if (result.answer === INVALID_QUESTION_MESSAGE) {
+    return <p className="text-sm leading-relaxed">{result.answer}</p>;
+  }
+
+  const jobAnswers = jobAnswersForDisplay(result);
+  if (jobAnswers.length === 0) {
+    return <p className="whitespace-pre-wrap text-sm leading-relaxed">{result.answer}</p>;
+  }
+
+  return (
+    <div className="grid gap-3">
+      {jobAnswers.map((item) => (
+        <div key={item.jobSlot} className="space-y-2 rounded-lg border border-border bg-muted/30 p-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge variant="outline">Job {item.jobSlot}</Badge>
+            {item.filename && <span className="truncate text-xs text-muted-foreground">{item.filename}</span>}
+          </div>
+          <p className="whitespace-pre-wrap text-sm leading-relaxed">{item.answer}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 type ResultsSectionProps = {
   jobs: Record<JobSlot, JobSlotState>;
+  askResult: CareerAskResult | null;
   analysis: CareerAnalysis | null;
   bestMatches: BestMatchResult[] | null;
 };
 
-export function ResultsSection({ jobs, analysis, bestMatches }: ResultsSectionProps) {
+export function ResultsSection({ jobs, askResult, analysis, bestMatches }: ResultsSectionProps) {
   return (
     <section aria-labelledby="results-heading" className="space-y-4">
       <h2 id="results-heading" className="text-lg font-semibold tracking-tight">
         Results
       </h2>
 
-      {!analysis && !bestMatches && (
+      {!askResult && !analysis && !bestMatches && (
         <p className="rounded-lg border border-dashed border-border p-6 text-sm text-muted-foreground">
-          Run an analysis or find the best match to see results here.
+          Ask a question or analyze a selected job to see results here.
         </p>
+      )}
+
+      {askResult && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <MessageCircleQuestion className="size-4" aria-hidden="true" />
+              Ask result
+            </CardTitle>
+            <CardDescription>Answered from the resume and selected job evidence only.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-5">
+            <AskAnswerBody result={askResult} />
+            {askResult.answer !== INVALID_QUESTION_MESSAGE && (
+              <SourceList sources={askResult.sources} jobs={jobs} />
+            )}
+          </CardContent>
+        </Card>
       )}
 
       {analysis && (
@@ -119,21 +196,7 @@ export function ResultsSection({ jobs, analysis, bestMatches }: ResultsSectionPr
               </div>
             </div>
 
-            <div className="space-y-2">
-              <h3 className="text-sm font-semibold">Sources</h3>
-              <ul className="space-y-1.5">
-                {analysis.sources.map((source, index) => (
-                  <li
-                    key={index}
-                    className="rounded-md border border-border bg-muted/40 px-2.5 py-2 text-xs text-muted-foreground"
-                  >
-                    filename: {source.filename ?? "unknown"} — documentType: {source.documentType} —
-                    job: {describeSource(source, jobs)} — chunkIndex: {source.chunkIndex} — similarity:{" "}
-                    {source.similarity.toFixed(3)}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <SourceList sources={analysis.sources} jobs={jobs} />
           </CardContent>
         </Card>
       )}

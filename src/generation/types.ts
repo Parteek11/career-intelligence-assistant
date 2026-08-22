@@ -3,9 +3,10 @@ import type { DocumentType, JobSlot } from "@/types/domain";
 /**
  * Shared types for grounded generation.
  *
- * `CareerAnalysis` / `BestMatchResult` are what the API returns. `sources`
- * is always attached by the analysis service from retrieved chunks — it is
- * not a model field. `categoryScores` *is* a model field; `score` is not.
+ * `CareerAnalysis` / `CareerAskResult` / `BestMatchResult` are what the
+ * API returns. `sources` is always attached by the analysis service from
+ * retrieved chunks — it is not a model field. `categoryScores` *is* a
+ * model field; `score` is not.
  */
 
 /** Citation shown in the UI for one retrieved chunk. */
@@ -25,6 +26,24 @@ export type CareerAnalysis = {
   experienceAlignment: string;
   interviewPreparation: string[];
   recommendations: string[];
+  sources: CareerAnalysisSource[];
+};
+
+export type CareerAskJobAnswer = {
+  jobSlot: JobSlot;
+  filename: string | null;
+  answer: string;
+};
+
+/**
+ * Ask answer: one grounded reply to the user's question, plus the chunks
+ * the model was shown. Unlike Analyze, this has no strengths / gaps /
+ * interview-prep sections. `jobAnswers` is filled when several jobs are
+ * in scope so the UI can render one block per job.
+ */
+export type CareerAskResult = {
+  answer: string;
+  jobAnswers: CareerAskJobAnswer[];
   sources: CareerAnalysisSource[];
 };
 

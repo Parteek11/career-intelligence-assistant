@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2, Sparkles, Trophy } from "lucide-react";
+import { Loader2, MessageCircleQuestion, Sparkles, Trophy } from "lucide-react";
 import { ErrorAlert } from "@/components/workspace/ErrorAlert";
 import type { JobSlotState } from "@/components/workspace/DocumentsSection";
 import { Button } from "@/components/ui/button";
@@ -14,13 +14,16 @@ type AnalysisSectionProps = {
   jobs: Record<JobSlot, JobSlotState>;
   selectedTarget: string;
   question: string;
+  asking: boolean;
   analyzing: boolean;
   findingBestMatch: boolean;
+  askError: string | null;
   analyzeError: string | null;
   bestMatchError: string | null;
   onTargetChange: (value: string) => void;
   onQuestionChange: (value: string) => void;
   onAsk: () => void;
+  onAnalyze: () => void;
   onFindBestMatch: () => void;
 };
 
@@ -28,15 +31,21 @@ export function AnalysisSection({
   jobs,
   selectedTarget,
   question,
+  asking,
   analyzing,
   findingBestMatch,
+  askError,
   analyzeError,
   bestMatchError,
   onTargetChange,
   onQuestionChange,
   onAsk,
+  onAnalyze,
   onFindBestMatch,
 }: AnalysisSectionProps) {
+  const busy = asking || analyzing || findingBestMatch;
+  const analyzeDisabled = busy || selectedTarget === "all";
+
   return (
     <section aria-labelledby="analysis-heading" className="space-y-4">
       <div>
@@ -44,7 +53,7 @@ export function AnalysisSection({
           Analysis
         </h2>
         <p className="text-sm text-muted-foreground">
-          Ask a question about career fit, or compare every uploaded job at once.
+          Ask a specific question, or analyze one selected job against the resume.
         </p>
       </div>
 
@@ -76,13 +85,35 @@ export function AnalysisSection({
               onChange={(event) => onQuestionChange(event.target.value)}
               rows={3}
             />
+            <p className="text-xs text-muted-foreground">
+              Used by Ask only. Analyze compares the resume to the selected job and ignores this box.
+            </p>
           </div>
 
+          {askError && <ErrorAlert message={askError} />}
           {analyzeError && <ErrorAlert message={analyzeError} />}
           {bestMatchError && <ErrorAlert message={bestMatchError} />}
 
           <div className="flex flex-wrap gap-2">
-            <Button type="button" onClick={onAsk} disabled={analyzing}>
+            <Button type="button" onClick={onAsk} disabled={busy}>
+              {asking ? (
+                <Loader2 className="animate-spin" aria-hidden="true" />
+              ) : (
+                <MessageCircleQuestion aria-hidden="true" />
+              )}
+              {asking ? "Asking..." : "Ask"}
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={onAnalyze}
+              disabled={analyzeDisabled}
+              title={
+                selectedTarget === "all"
+                  ? "Select a specific job to analyze"
+                  : undefined
+              }
+            >
               {analyzing ? (
                 <Loader2 className="animate-spin" aria-hidden="true" />
               ) : (
@@ -90,7 +121,7 @@ export function AnalysisSection({
               )}
               {analyzing ? "Analyzing..." : "Analyze"}
             </Button>
-            <Button type="button" variant="secondary" onClick={onFindBestMatch} disabled={findingBestMatch}>
+            <Button type="button" variant="secondary" onClick={onFindBestMatch} disabled={busy}>
               {findingBestMatch ? (
                 <Loader2 className="animate-spin" aria-hidden="true" />
               ) : (
@@ -99,6 +130,11 @@ export function AnalysisSection({
               {findingBestMatch ? "Finding best match..." : "Find Best Match"}
             </Button>
           </div>
+          {selectedTarget === "all" && (
+            <p className="text-xs text-muted-foreground">
+              Analyze is available when a single job is selected.
+            </p>
+          )}
         </CardContent>
       </Card>
     </section>

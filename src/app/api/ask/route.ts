@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import { getJobBySlot } from "@/db/queries";
-import { analyzeCareerFit } from "@/services/analysis";
+import { askCareerQuestion } from "@/services/analysis";
 import { isJobSlot } from "@/types/domain";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-type AnalyzeRequestBody = {
+type AskRequestBody = {
+  question: string;
   target: string;
 };
 
@@ -20,7 +21,7 @@ export async function POST(request: Request) {
 
   if (!isValidBody(body)) {
     return NextResponse.json(
-      { error: 'target ("1"-"4") is required. Analyze is not available for all jobs.' },
+      { error: 'question (non-empty string) and target ("1"-"4" or "all") are required' },
       { status: 400 },
     );
   }
@@ -34,26 +35,28 @@ export async function POST(request: Request) {
   }
 
   try {
-    const analysis = await analyzeCareerFit({ targetJobId });
-    return NextResponse.json(analysis);
+    const result = await askCareerQuestion({ question: body.question, targetJobId });
+    return NextResponse.json(result);
   } catch (error) {
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Analysis failed" },
+      { error: error instanceof Error ? error.message : "Ask failed" },
       { status: 400 },
     );
   }
 }
 
-async function resolveTargetJobId(target: string): Promise<string | "not_found"> {
+async function resolveTargetJobId(target: string): Promise<string | "all" | "not_found"> {
+  if (target === "all") return "all";
   const slot = Number(target);
   if (!isJobSlot(slot)) return "not_found";
   const job = await getJobBySlot(slot);
   return job ? job.id : "not_found";
 }
 
-function isValidBody(value: unknown): value is AnalyzeRequestBody {
+function isValidBody(value: unknown): value is AskRequestBody {
   if (typeof value !== "object" || value === null) return false;
   const record = value as Record<string, unknown>;
+  if (typeof record.question !== "string" || record.question.trim().length === 0) return false;
   if (typeof record.target !== "string") return false;
-  return isJobSlot(Number(record.target));
+  return record.target === "all" || isJobSlot(Number(record.target));
 }

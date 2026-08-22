@@ -10,7 +10,7 @@ import {
   type JobSlotState,
 } from "@/components/workspace/DocumentsSection";
 import { ResultsSection } from "@/components/workspace/ResultsSection";
-import type { BestMatchResult, CareerAnalysis } from "@/generation/types";
+import type { BestMatchResult, CareerAnalysis, CareerAskResult } from "@/generation/types";
 import { JOB_SLOTS, type JobSlot } from "@/types/domain";
 
 const EMPTY_RESUME: FileSlotState = { filename: null, busy: false, error: null };
@@ -38,6 +38,9 @@ export function CareerWorkspace() {
   const [clearError, setClearError] = useState<string | null>(null);
   const [selectedTarget, setSelectedTarget] = useState("all");
   const [question, setQuestion] = useState("");
+  const [asking, setAsking] = useState(false);
+  const [askResult, setAskResult] = useState<CareerAskResult | null>(null);
+  const [askError, setAskError] = useState<string | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<CareerAnalysis | null>(null);
   const [analyzeError, setAnalyzeError] = useState<string | null>(null);
@@ -185,6 +188,8 @@ export function CareerWorkspace() {
       setJobs({ 1: EMPTY_JOB, 2: EMPTY_JOB, 3: EMPTY_JOB, 4: EMPTY_JOB });
       setSelectedTarget("all");
       setQuestion("");
+      setAskResult(null);
+      setAskError(null);
       setAnalysis(null);
       setAnalyzeError(null);
       setBestMatches(null);
@@ -196,24 +201,65 @@ export function CareerWorkspace() {
     }
   }
 
-  async function handleAsk() {
-    setAnalyzeError(null);
+  function clearResults() {
+    setAskResult(null);
+    setAskError(null);
     setAnalysis(null);
+    setAnalyzeError(null);
+    setBestMatches(null);
+    setBestMatchError(null);
+  }
+
+  async function handleAsk() {
+    clearResults();
 
     if (!resume.filename) {
-      setAnalyzeError("Upload a resume before asking a question.");
+      setAskError("Upload a resume before asking a question.");
       return;
     }
     if (selectedTarget !== "all" && !jobs[Number(selectedTarget) as JobSlot].filename) {
-      setAnalyzeError(`Upload Job ${selectedTarget} before selecting it.`);
+      setAskError(`Upload Job ${selectedTarget} before selecting it.`);
       return;
     }
     if (selectedTarget === "all" && !hasAnyJob) {
-      setAnalyzeError("Upload at least one job description before asking a question.");
+      setAskError("Upload at least one job description before asking a question.");
       return;
     }
     if (!question.trim()) {
-      setAnalyzeError("Enter a question before asking.");
+      setAskError("Enter a question before asking.");
+      return;
+    }
+
+    setAsking(true);
+    try {
+      const response = await fetch("/api/ask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question, target: selectedTarget }),
+      });
+      const body = (await response.json()) as CareerAskResult & { error?: string };
+      if (!response.ok) throw new Error(body.error ?? "Ask failed");
+      setAskResult(body);
+    } catch (error) {
+      setAskError(error instanceof Error ? error.message : "Ask failed");
+    } finally {
+      setAsking(false);
+    }
+  }
+
+  async function handleAnalyze() {
+    clearResults();
+
+    if (selectedTarget === "all") {
+      setAnalyzeError("Select a specific job before analyzing.");
+      return;
+    }
+    if (!resume.filename) {
+      setAnalyzeError("Upload a resume before analyzing.");
+      return;
+    }
+    if (!jobs[Number(selectedTarget) as JobSlot].filename) {
+      setAnalyzeError(`Upload Job ${selectedTarget} before selecting it.`);
       return;
     }
 
@@ -222,7 +268,7 @@ export function CareerWorkspace() {
       const response = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question, target: selectedTarget }),
+        body: JSON.stringify({ target: selectedTarget }),
       });
       const body = (await response.json()) as CareerAnalysis & { error?: string };
       if (!response.ok) throw new Error(body.error ?? "Analysis failed");
@@ -235,8 +281,7 @@ export function CareerWorkspace() {
   }
 
   async function handleFindBestMatch() {
-    setBestMatchError(null);
-    setBestMatches(null);
+    clearResults();
 
     if (!hasAnyJob) {
       setBestMatchError("Upload at least one job description before finding the best match.");
@@ -282,16 +327,19 @@ export function CareerWorkspace() {
         jobs={jobs}
         selectedTarget={selectedTarget}
         question={question}
+        asking={asking}
         analyzing={analyzing}
         findingBestMatch={findingBestMatch}
+        askError={askError}
         analyzeError={analyzeError}
         bestMatchError={bestMatchError}
         onTargetChange={setSelectedTarget}
         onQuestionChange={setQuestion}
         onAsk={handleAsk}
+        onAnalyze={handleAnalyze}
         onFindBestMatch={handleFindBestMatch}
       />
-      <ResultsSection jobs={jobs} analysis={analysis} bestMatches={bestMatches} />
+      <ResultsSection jobs={jobs} askResult={askResult} analysis={analysis} bestMatches={bestMatches} />
     </div>
   );
 }

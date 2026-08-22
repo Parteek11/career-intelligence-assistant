@@ -1,4 +1,5 @@
-import { SCORE_CATEGORIES, type CategoryScores } from "@/generation/types";
+import { SCORE_CATEGORIES, type CareerAskJobAnswer, type CategoryScores } from "@/generation/types";
+import { isJobSlot } from "@/types/domain";
 
 /**
  * Strict parsers for Groq JSON.
@@ -41,6 +42,38 @@ function requireStringArray(record: Record<string, unknown>, field: string): str
     throw new Error(`Model response is missing a "${field}" array of strings`);
   }
   return value;
+}
+
+/**
+ * Validate the Ask response shape. Extra keys from the model are ignored.
+ * `jobAnswers` is optional so a single-job reply can be just `{ answer }`.
+ */
+export function parseAskResponse(raw: string) {
+  const parsed = parseJsonObject(raw);
+  const jobAnswers = parseJobAnswers(parsed.jobAnswers);
+  const answer = typeof parsed.answer === "string" ? parsed.answer.trim() : "";
+  if (!answer && jobAnswers.length === 0) {
+    throw new Error('Model response is missing a non-empty "answer" or "jobAnswers"');
+  }
+  return { answer, jobAnswers };
+}
+
+function parseJobAnswers(value: unknown): CareerAskJobAnswer[] {
+  if (!Array.isArray(value)) return [];
+  const answers: CareerAskJobAnswer[] = [];
+  for (const item of value) {
+    if (typeof item !== "object" || item === null) continue;
+    const record = item as Record<string, unknown>;
+    const slot = Number(record.jobSlot);
+    if (!isJobSlot(slot)) continue;
+    if (typeof record.answer !== "string" || record.answer.trim().length === 0) continue;
+    answers.push({
+      jobSlot: slot,
+      filename: typeof record.filename === "string" ? record.filename.trim() || null : null,
+      answer: record.answer.trim(),
+    });
+  }
+  return answers;
 }
 
 /**
