@@ -7,6 +7,16 @@ import type { LogicalJobId } from "./types";
  * and job-id restrictions unambiguous. This is separate from — and
  * overwrites — whatever resume/jobs are currently uploaded through the
  * app UI; see README "Evaluation" for why.
+ *
+ * Design of the four jobs (deliberate overlap + contrast):
+ * - job_1 backend — strong overlap with the resume (TS, Node, Postgres, mentoring)
+ * - job_2 frontend — partial overlap (React + TypeScript only)
+ * - job_3 cloud — intentional *non*-match (AWS / Terraform / K8s are called out as absent)
+ * - job_4 AI/RAG — strong overlap (LangChain, pgvector, embeddings)
+ *
+ * Questions in `golden-questions.json` rely on these contrasts, e.g.
+ * "cloud gaps" should retrieve job_3 + the resume's "No production
+ * experience with AWS…" line.
  */
 export const GOLDEN_RESUME = {
   filename: "golden-resume.txt",

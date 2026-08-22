@@ -1,5 +1,18 @@
-// Seeds a golden resume + 4 jobs, runs questions through retrieveCareerEvidence,
-// writes evaluation/results/latest.json, then clears the seeded data.
+/**
+ * CLI entry for retrieval evaluation.
+ *
+ * Flow:
+ *   1. Load `.env` and the golden-questions JSON.
+ *   2. Seed the golden resume + 4 JDs through the real upload services
+ *      (this overwrites whatever is currently in the database).
+ *   3. Run each question through `retrieveCareerEvidence`.
+ *   4. Write `evaluation/results/latest.json` plus a timestamped copy.
+ *   5. `clearAll()` so the user's previous uploads are not left replaced
+ *      by the golden corpus.
+ *   6. Close the pg pool so the process can exit.
+ *
+ * Run with `npm run eval:retrieval`. Requires `DATABASE_URL`.
+ */
 
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -24,6 +37,10 @@ import type { EvaluationReport } from "./types";
 const currentDir = dirname(fileURLToPath(import.meta.url));
 const resultsDir = join(currentDir, "../results");
 
+/**
+ * Persist the report twice: a timestamped snapshot for history, and
+ * `latest.json` so docs / CI can always point at one stable path.
+ */
 function writeReport(report: EvaluationReport): string {
   if (!existsSync(resultsDir)) {
     mkdirSync(resultsDir, { recursive: true });
@@ -39,6 +56,7 @@ function writeReport(report: EvaluationReport): string {
   return timestampedFile;
 }
 
+/** Human-readable per-question + aggregate dump for the terminal. */
 function printSummary(report: EvaluationReport, resultFile: string): void {
   console.log("\nPer-question results:");
   for (const question of report.perQuestion) {
@@ -65,6 +83,13 @@ function printSummary(report: EvaluationReport, resultFile: string): void {
   console.log(`\nResults written to ${resultFile}`);
 }
 
+/**
+ * Seed → retrieve → score → write → clean up.
+ *
+ * `configuration` is stored on the report so a later change to chunk
+ * size, overlap, top-K, or the embedding model is visible next to the
+ * numbers it produced.
+ */
 async function main(): Promise<void> {
   loadProjectEnv();
 
@@ -106,5 +131,6 @@ main()
     process.exitCode = 1;
   })
   .finally(async () => {
+    // The pool keeps the event loop alive until we end it.
     await getPool().end();
   });

@@ -14,9 +14,27 @@ import {
   type RetrievalTarget,
 } from "@/services/retrieval";
 
+/**
+ * Analysis service: retrieve evidence, call Groq, attach sources.
+ *
+ * The LLM never sees the raw database and never computes the Best Match
+ * overall score. Retrieval decides the evidence; TypeScript decides the
+ * weighted score; the model only writes grounded JSON from the chunks.
+ */
+
+/**
+ * Fixed query used for every Best Match job. Using the same wording for
+ * all four slots means score differences come from the *job evidence*,
+ * not from a different question embedding per slot.
+ */
 const BEST_MATCH_QUERY =
   "Evaluate the candidate's overall fit for this job across technical skills, experience, domain, and seniority.";
 
+/**
+ * Strip chunk text before returning sources to the UI.
+ * Citations need filename / type / job / index / similarity — not a second
+ * copy of the prompt context.
+ */
 function toSource(item: CareerEvidenceItem): CareerAnalysisSource {
   return {
     filename: item.filename,
@@ -27,6 +45,15 @@ function toSource(item: CareerEvidenceItem): CareerAnalysisSource {
   };
 }
 
+/**
+ * Answer one career question against a chosen job (or all jobs).
+ *
+ * Pipeline:
+ *   retrieveCareerEvidence → buildAnalysisPrompt → Groq JSON → parse → attach sources
+ *
+ * `sources` is always taken from the retrieved chunks, never from the
+ * model, so the UI cannot show a citation the retriever did not return.
+ */
 export async function analyzeCareerFit(input: {
   question: string;
   targetJobId: RetrievalTarget;
@@ -48,6 +75,17 @@ export async function analyzeCareerFit(input: {
   return { ...modelOutput, sources: evidence.map(toSource) };
 }
 
+/**
+ * Score every uploaded job independently, then sort high → low.
+ *
+ * Isolation matters: each job gets its own retrieve + generate call with
+ * `targetJobId = job.id`. That is what stops Job 2's requirements from
+ * leaking into Job 1's score. A job with no JD chunks is skipped rather
+ * than scored from resume-only evidence (which would look like a match).
+ *
+ * `calculateWeightedScore` runs in this process with fixed weights so the
+ * model cannot inflate one overall number.
+ */
 export async function findBestMatch(): Promise<BestMatchResult[]> {
   const jobs = await listJobs();
   if (jobs.length === 0) {

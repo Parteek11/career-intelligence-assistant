@@ -1,5 +1,15 @@
 import { SCORE_CATEGORIES, type CategoryScores } from "@/generation/types";
 
+/**
+ * Strict parsers for Groq JSON.
+ *
+ * `response_format: json_object` only guarantees *some* JSON object. The
+ * model can still omit fields, send numbers as strings, or invent extra
+ * keys. These helpers fail fast with a clear error so the API returns
+ * 500 instead of rendering a half-valid analysis in the UI.
+ */
+
+/** Parse a string as a plain object. Arrays and primitives are rejected. */
 function parseJsonObject(raw: string): Record<string, unknown> {
   let parsed: unknown;
   try {
@@ -15,6 +25,7 @@ function parseJsonObject(raw: string): Record<string, unknown> {
   return parsed as Record<string, unknown>;
 }
 
+/** Require a non-empty string field. Whitespace-only counts as missing. */
 function requireString(record: Record<string, unknown>, field: string): string {
   const value = record[field];
   if (typeof value !== "string" || value.trim().length === 0) {
@@ -23,6 +34,7 @@ function requireString(record: Record<string, unknown>, field: string): string {
   return value;
 }
 
+/** Require an array of strings (empty array is allowed — e.g. no skill gaps). */
 function requireStringArray(record: Record<string, unknown>, field: string): string[] {
   const value = record[field];
   if (!Array.isArray(value) || !value.every((item) => typeof item === "string")) {
@@ -31,6 +43,10 @@ function requireStringArray(record: Record<string, unknown>, field: string): str
   return value;
 }
 
+/**
+ * Validate the Analyze response shape.
+ * Extra keys from the model are ignored; only the documented fields are kept.
+ */
 export function parseAnalysisResponse(raw: string) {
   const parsed = parseJsonObject(raw);
   return {
@@ -43,6 +59,13 @@ export function parseAnalysisResponse(raw: string) {
   };
 }
 
+/**
+ * Validate the Best Match response, including every category score.
+ *
+ * Each score must be a finite number in `[0, 100]`. We iterate
+ * `SCORE_CATEGORIES` (not `Object.keys` of the model object) so a renamed
+ * or missing category cannot slip through, and extra model keys are dropped.
+ */
 export function parseBestMatchResponse(raw: string) {
   const parsed = parseJsonObject(raw);
   const scores = parsed.categoryScores;

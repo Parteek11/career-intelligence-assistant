@@ -11,13 +11,34 @@ import { GOLDEN_JOBS, GOLDEN_RESUME } from "./golden-corpus";
 import { average, averageDefined, computeLabeledMetrics } from "./metrics";
 import type { EvaluationReport, GoldenCase, LogicalJobId, QuestionResult } from "./types";
 
+/**
+ * Retrieval evaluation harness.
+ *
+ * This file does **not** reimplement search. It seeds a known corpus
+ * through the same `uploadResume` / `uploadJobDescription` services the
+ * app uses, then calls `retrieveCareerEvidence` for each golden question.
+ * That is the point: we measure the production retrieval path, not a
+ * parallel test-only implementation.
+ *
+ * Logical ids (`job_1` … `job_4`) in the JSON dataset are mapped to the
+ * UUIDs Postgres assigned at seed time. Metrics then compare retrieved
+ * `jobId`s against those UUIDs.
+ */
+
 export const EMBEDDING_MODEL_NAME = "Xenova/all-MiniLM-L6-v2";
+/** Top-K used for every golden question. Matches a typical Analyze request. */
 export const TOP_K = 5;
 
 const currentDir = dirname(fileURLToPath(import.meta.url));
 const datasetPath = join(currentDir, "../datasets/golden-questions.json");
 const projectRoot = join(currentDir, "../..");
 
+/**
+ * Load `.env` into `process.env` without overwriting values already set
+ * (so `DATABASE_URL=… npm run eval:retrieval` still wins). The eval
+ * script is a standalone Node process, not Next.js, so it does not get
+ * Next's automatic env loading.
+ */
 export function loadProjectEnv(): void {
   const envPath = join(projectRoot, ".env");
   if (!existsSync(envPath)) return;
@@ -35,10 +56,17 @@ export function loadProjectEnv(): void {
   }
 }
 
+/** Read the labeled golden questions. Each case is one retrieval probe. */
 export function loadDataset(): GoldenCase[] {
   return JSON.parse(readFileSync(datasetPath, "utf8")) as GoldenCase[];
 }
 
+/**
+ * After seeding we need two maps:
+ * - `jobIdByLogicalId` — JSON `job_1` → the UUID retrieval will return
+ * - `relevantChunkCounts` — how many chunks exist per source, used as
+ *   the denominator for Recall@K (true corpus size, not a guess)
+ */
 export type SeededCorpus = {
   jobIdByLogicalId: Record<LogicalJobId, string>;
   relevantChunkCounts: {
@@ -47,6 +75,15 @@ export type SeededCorpus = {
   };
 };
 
+/**
+ * Upload the golden resume + four JDs through the real ingest path.
+ *
+ * This overwrites whatever the user currently has in the database (same
+ * single-resume / slot-1–4 model as the UI). `run-evaluation.ts` calls
+ * `clearAll()` when finished. Chunk counts are recorded here because
+ * recall needs "how many relevant chunks exist", and that number depends
+ * on the live splitter settings (`DEFAULT_CHUNK_SIZE` / overlap).
+ */
 export async function seedGoldenCorpus(): Promise<SeededCorpus> {
   const resumeSummary = await uploadResume({
     buffer: Buffer.from(GOLDEN_RESUME.content),
@@ -80,6 +117,15 @@ export async function seedGoldenCorpus(): Promise<SeededCorpus> {
   };
 }
 
+/**
+ * Run one golden question through production retrieval and score it.
+ *
+ * `targetJobId: "all"` is passed through as-is. Any other logical id is
+ * translated to the seeded UUID so `retrieveCareerEvidence` applies the
+ * same job filter the UI would. `totalRelevant` is the count of chunks
+ * that *should* be acceptable for this question (resume and/or the
+ * expected jobs) — that is Recall@K's denominator.
+ */
 export async function runQuestion(
   testCase: GoldenCase,
   corpus: SeededCorpus,
@@ -136,6 +182,7 @@ export async function runQuestion(
   };
 }
 
+/** Run every golden question sequentially. Order matches the JSON file. */
 export async function runDataset(
   dataset: GoldenCase[],
   corpus: SeededCorpus,
@@ -148,6 +195,11 @@ export async function runDataset(
   return perQuestion;
 }
 
+/**
+ * Macro-average each metric across questions.
+ * `jobFilterAccuracy` / `jobCoverage` are null on the questions they do
+ * not apply to, so we use `averageDefined` and skip those nulls.
+ */
 export function buildAggregate(perQuestion: QuestionResult[]): EvaluationReport["aggregate"] {
   return {
     precisionAtK: average(perQuestion.map((q) => q.metrics.precisionAtK)),
@@ -159,6 +211,7 @@ export function buildAggregate(perQuestion: QuestionResult[]): EvaluationReport[
   };
 }
 
+/** Format a nullable metric for the console summary (`null` → `"n/a"`). */
 export function formatOptionalMetric(value: number | null): string {
   return value === null ? "n/a" : value.toFixed(2);
 }

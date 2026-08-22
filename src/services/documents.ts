@@ -13,6 +13,20 @@ import { embeddings } from "@/rag/embed";
 import { ingestFile, type IngestionFile } from "@/rag/ingest";
 import { isJobSlot, type JobSlot } from "@/types/domain";
 
+/**
+ * Document service: the write path of RAG.
+ *
+ * Upload flow for both resume and job descriptions:
+ *   1. Upsert the parent row (`resumes` / `jobs`) and its `documents` row.
+ *   2. `ingestFile` — load, clean, split into overlapping chunks.
+ *   3. Embed every chunk with the same MiniLM model used at query time.
+ *   4. `replaceDocumentChunks` — delete the previous vectors and insert the new ones
+ *      in one transaction so a failed re-upload never leaves a half-written corpus.
+ *
+ * Re-uploading a slot always replaces that slot's chunks. Identity is the
+ * job *slot* (1–4) or the single resume row, never the filename.
+ */
+
 export type UploadFile = IngestionFile;
 
 export type UploadSummary = {
@@ -24,6 +38,13 @@ export type JobUploadSummary = UploadSummary & {
   jobId: string;
 };
 
+/**
+ * Map LangChain chunks + their embedding vectors onto the DB insert shape.
+ *
+ * `chunk_index` is taken from ingestion metadata when present so a later
+ * re-split with the same settings keeps stable indices. `page_number` is
+ * optional — text files have none.
+ */
 async function persistChunks(
   documentId: string,
   chunks: Document[],
@@ -43,6 +64,11 @@ async function persistChunks(
   );
 }
 
+/**
+ * Shared ingest → embed → persist step used by both resume and JD uploads.
+ * An empty file produces zero vectors and still replaces existing chunks,
+ * which is how a blank re-upload clears stale evidence.
+ */
 async function ingestAndPersist(
   file: UploadFile,
   meta: {
@@ -60,6 +86,10 @@ async function ingestAndPersist(
   return { documentId: meta.documentId, chunkCount };
 }
 
+/**
+ * Create or replace the single app resume, then ingest its file.
+ * `jobId` is always `null` — resume chunks must not attach to a job slot.
+ */
 export async function uploadResume(file: UploadFile): Promise<UploadSummary> {
   const resume = await upsertResume(file.filename);
   const document = await upsertResumeDocument({
@@ -77,10 +107,15 @@ export async function uploadResume(file: UploadFile): Promise<UploadSummary> {
   });
 }
 
+/** Delete the resume row; `ON DELETE CASCADE` removes its document and chunks. */
 export async function deleteResume(): Promise<void> {
   await deleteResumeRow();
 }
 
+/**
+ * Create or replace the job in `slot` (1–4) and ingest its description.
+ * The returned `jobId` is the UUID retrieval uses as a metadata filter.
+ */
 export async function uploadJobDescription(
   slot: JobSlot,
   file: UploadFile,
@@ -107,10 +142,12 @@ export async function uploadJobDescription(
   return { ...summary, jobId: job.id };
 }
 
+/** Delete one job slot; cascade removes its document and chunks. */
 export async function deleteJobDescription(slot: JobSlot): Promise<void> {
   await deleteJobBySlot(slot);
 }
 
+/** Wipe resume + all four jobs. Used by the UI "Clear all" action and eval cleanup. */
 export async function clearAll(): Promise<void> {
   await deleteResumeRow();
   await deleteAllJobs();

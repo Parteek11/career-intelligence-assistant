@@ -1,6 +1,16 @@
 import type { RetrievedItemForEval } from "./types";
 
-/** Metric helpers for the retrieval eval harness. */
+/**
+ * Deterministic retrieval metrics. No LLM-as-judge — every function is a
+ * labeled-set calculation so two runs on the same corpus produce the same
+ * numbers (latency aside).
+ *
+ * Metric roles:
+ * - Precision@K / Recall@K — "did we retrieve the right *documents*?"
+ * - Concept hit rate — "did the chunk *text* contain the expected keywords?"
+ * - Job-filter accuracy — specific-job queries must not leak another job
+ * - Job coverage — All Jobs queries should surface more than one expected job
+ */
 
 /**
  * A retrieved chunk counts as relevant to a question when its document
@@ -8,6 +18,9 @@ import type { RetrievedItemForEval } from "./types";
  * its job id is one the question expects. An empty `expectedJobIds` means
  * the question does not restrict which job's chunks are acceptable (e.g.
  * a broad "all jobs" question with no single expected job).
+ *
+ * Resume chunks only need the type check: they have `jobId = null` and
+ * are never "the wrong job".
  */
 export function isRelevantItem(
   item: RetrievedItemForEval,
@@ -28,7 +41,11 @@ export function isRelevantItem(
   return true;
 }
 
-/** Fraction of the top-K retrieved items that are relevant. */
+/**
+ * Fraction of the top-K retrieved items that are relevant.
+ * `retrieved.length` is the denominator (not a fixed K) so a short
+ * result list is not rewarded as if it filled the full window.
+ */
 export function precisionAtK(
   retrieved: RetrievedItemForEval[],
   expectedDocumentTypes: string[],
@@ -52,6 +69,8 @@ export function precisionAtK(
  * it is computed from the known size of the seeded golden corpus, not
  * guessed. A question with zero relevant chunks available is treated as
  * trivially satisfied (there is nothing to fail to recall).
+ *
+ * Capped at 1 in case the same chunk is counted twice after the resume+JD merge.
  */
 export function recallAtK(
   retrieved: RetrievedItemForEval[],
@@ -76,6 +95,9 @@ export function recallAtK(
  * specific-job question that returns even one chunk from a different job
  * scores below 1 here, regardless of how it scores on precision/recall.
  * Resume chunks (job id null) are not job-filterable and are excluded.
+ *
+ * Vacuous 1 when the question has no expected jobs, or when no JD chunks
+ * were retrieved (nothing leaked).
  */
 export function jobFilterAccuracy(
   retrieved: RetrievedItemForEval[],
@@ -103,6 +125,9 @@ export function jobFilterAccuracy(
  * coarse, deterministic substring check — not semantic matching — chosen
  * specifically so it needs no LLM judge and produces the same result on
  * every run.
+ *
+ * Concepts are joined across *all* retrieved text: a keyword in any
+ * chunk counts. Empty `expectedConcepts` is vacuously 1.
  */
 export function conceptHitRate(
   retrieved: RetrievedItemForEval[],
@@ -148,6 +173,7 @@ export function jobCoverage(
   return found / expectedJobIds.size;
 }
 
+/** Inputs shared by every labeled metric for one question. */
 export type LabeledMetricsInput = {
   isAllJobsQuery: boolean;
   retrieved: RetrievedItemForEval[];
@@ -158,8 +184,11 @@ export type LabeledMetricsInput = {
 };
 
 /**
- * Applies the All Jobs vs specific-job labeling rules: jobFilterAccuracy
- * only for a selected job, jobCoverage only for All Jobs.
+ * Applies the All Jobs vs specific-job labeling rules:
+ * - `jobFilterAccuracy` only for a selected job (null on All Jobs)
+ * - `jobCoverage` only for All Jobs (null on a selected job)
+ *
+ * Those two measure opposite things and must not be averaged together.
  */
 export function computeLabeledMetrics(input: LabeledMetricsInput) {
   const {
@@ -179,6 +208,7 @@ export function computeLabeledMetrics(input: LabeledMetricsInput) {
   };
 }
 
+/** Arithmetic mean. Empty list → 0 so an empty dataset does not produce NaN. */
 export function average(values: number[]): number {
   if (values.length === 0) {
     return 0;
@@ -186,6 +216,10 @@ export function average(values: number[]): number {
   return values.reduce((sum, value) => sum + value, 0) / values.length;
 }
 
+/**
+ * Mean of the non-null values. Returns `null` when every input is null
+ * (e.g. a dataset with only All Jobs questions has no job-filter scores).
+ */
 export function averageDefined(values: Array<number | null>): number | null {
   const defined = values.filter((value): value is number => value !== null);
   if (defined.length === 0) {
