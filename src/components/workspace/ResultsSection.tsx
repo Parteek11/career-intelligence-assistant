@@ -267,6 +267,8 @@ export function ResultsSection({ jobs, askResult, analysis, bestMatches }: Resul
                   <h4 className="text-xs font-semibold">Reasoning</h4>
                   <p className="text-sm text-muted-foreground">{match.reasoning}</p>
                 </div>
+
+                {match.sources.length > 0 && <SourceList sources={match.sources} jobs={jobs} />}
               </CardContent>
             </Card>
           ))}

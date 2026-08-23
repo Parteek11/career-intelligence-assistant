@@ -1,4 +1,4 @@
-import { searchSimilarChunks } from "@/db/queries";
+import { searchSimilarChunks, type SimilarChunk } from "@/db/queries";
 import { embeddings } from "@/rag/embed";
 import type { DocumentType } from "@/types/domain";
 
@@ -27,14 +27,38 @@ export type CareerEvidenceItem = {
 /** Default number of chunks handed to the prompt after the merge step. */
 const DEFAULT_TOP_K = 10;
 
+function chunkKey(row: SimilarChunk): string {
+  return `${row.documentType}:${row.jobId ?? "resume"}:${row.chunkIndex}`;
+}
+
 /**
- * Embed `query`, search resume and job chunks in parallel, then merge.
+ * Keep both resume and JD in the prompt.
  *
- * Why two searches instead of one unfiltered query?
- * A single search over the whole table would let a long JD drown out the
- * resume (or vice versa). Fetching `topK` from each side, then sorting by
- * cosine distance and slicing to `topK`, keeps both sources in the prompt
- * even when one corpus is much larger.
+ * Two searches already fetch `topK` from each side. A later global
+ * `slice(0, topK)` still lets a long, query-similar JD take every slot
+ * (Job 2 Best Match: 10 JD chunks, 0 resume, scores of 0). Reserve half
+ * the budget for each source, then fill any leftover slots by distance.
+ */
+function mergeWithSourceQuota(
+  resumeMatches: SimilarChunk[],
+  jobMatches: SimilarChunk[],
+  topK: number,
+): SimilarChunk[] {
+  const resumeQuota = Math.max(1, Math.ceil(topK / 2));
+  const jobQuota = Math.max(1, topK - resumeQuota);
+  const reserved = [...resumeMatches.slice(0, resumeQuota), ...jobMatches.slice(0, jobQuota)];
+  const taken = new Set(reserved.map(chunkKey));
+  const leftovers = [...resumeMatches, ...jobMatches]
+    .filter((row) => !taken.has(chunkKey(row)))
+    .sort((a, b) => a.distance - b.distance);
+  const remaining = Math.max(0, topK - reserved.length);
+
+  return [...reserved, ...leftovers.slice(0, remaining)].sort((a, b) => a.distance - b.distance);
+}
+
+/**
+ * Embed `query`, search resume and job chunks in parallel, then merge
+ * with a per-source quota so neither side can drown the other.
  *
  * `"all"` jobs still filters to `document_type = 'job_description'` on the
  * job side, so we never pull a stray resume row from that query. The
@@ -62,17 +86,12 @@ export async function retrieveCareerEvidence(input: {
     searchSimilarChunks(queryEmbedding, { topK, filters: jobFilters }),
   ]);
 
-  // Lower `distance` = closer in embedding space. After the merge we keep
-  // only the global top-K so the prompt stays a fixed size.
-  return [...resumeMatches, ...jobMatches]
-    .sort((a, b) => a.distance - b.distance)
-    .slice(0, topK)
-    .map((row) => ({
-      content: row.content,
-      similarity: row.similarity,
-      documentType: row.documentType,
-      jobId: row.jobId,
-      filename: typeof row.metadata.original_filename === "string" ? row.metadata.original_filename : null,
-      chunkIndex: row.chunkIndex,
-    }));
+  return mergeWithSourceQuota(resumeMatches, jobMatches, topK).map((row) => ({
+    content: row.content,
+    similarity: row.similarity,
+    documentType: row.documentType,
+    jobId: row.jobId,
+    filename: typeof row.metadata.original_filename === "string" ? row.metadata.original_filename : null,
+    chunkIndex: row.chunkIndex,
+  }));
 }

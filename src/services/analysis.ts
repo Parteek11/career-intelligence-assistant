@@ -33,7 +33,7 @@ import { isJobSlot, type JobSlot } from "@/types/domain";
  * not from a different question embedding per slot.
  */
 const BEST_MATCH_QUERY =
-  "Evaluate the candidate's overall fit for this job across technical skills, experience, domain, and seniority.";
+  "The candidate's technical skills, programming languages, frameworks, tools, projects, work experience, and education matched to the job's required qualifications and responsibilities.";
 
 /**
  * Fixed retrieval query for Analyze. Wording is chosen so MiniLM scores
