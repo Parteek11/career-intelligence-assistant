@@ -19,7 +19,7 @@ npm run dev                   # http://localhost:3000
 Retrieval and embeddings work without Groq. Generation needs `GROQ_API_KEY`.
 
 ```bash
-npm run eval:retrieval        # seeds a golden corpus, then clears it
+npm run eval                  # seeds golden PDFs, scores 5 metrics, then clears them
 ```
 
 ## How it works
@@ -62,25 +62,35 @@ src/rag                     ingest + embed
 src/generation              ChatGroq, prompts, JSON parse
 src/services                upload, retrieve, analyze, best match
 src/db                      pool.ts, queries.ts, migrations/
-evaluation/                 golden questions + retrieval metrics
+evaluation/                 golden PDFs + 5-metric eval runner
 ```
 
 ## Evaluation
 
-`npm run eval:retrieval` uploads a fixed resume + 4 jobs, runs 10 questions through the real retriever, then deletes that data.
+`npm run eval` uploads the golden PDFs (1 resume + 2 JDs), runs 20 labeled questions through the real retrieve + Ask path, then deletes that data. Needs `DATABASE_URL`. Generation metrics also need `GROQ_API_KEY`.
 
-Last recorded baseline (character chunking 900/120, MiniLM, top-5):
+| Kind | Metric | Meaning |
+|---|---|---|
+| Retrieval | Precision@5 | Of the chunks we returned, how many were the right source? |
+| Retrieval | Recall@5 | Of the relevant chunks that could fit in top-5, how many did we get? |
+| Generation | Faithfulness | How much of the answer appears in the retrieved chunks? |
+| Generation | Answer relevance | How much of the question is covered by the answer? |
+| Generation | Answer correctness | How much of the written gold answer is covered by the answer? |
+
+Retrieval is labeled (document type + job). Generation is word overlap against retrieved text, the question, and `evaluation/golden.json` reference answers. This is a small assignment check, not a production RAGAS benchmark.
+
+Golden files: `evaluation/fixtures/resume.pdf`, `job-1.pdf` (MERN / Veritech.ai), `job-2.pdf` (Staff Software Engineer FDE).
+
+Last run (top-5, MiniLM, real Ask path):
 
 | Metric | Value |
 |---|---|
-| Precision@5 | 0.640 |
-| Recall@5 | 1.000 |
-| Concept hit rate | 1.000 |
-| Specific-job filter accuracy | 1.000 |
-| All-Jobs coverage | 1.000 |
-
-This is a small MVP check (binary relevance by document type + job id, keyword concept hits). It is not a production benchmark. Generation quality is not scored.
+| Precision@5 | 0.667 |
+| Recall@5 | 0.667 |
+| Faithfulness | 0.696 |
+| Answer relevance | 0.654 |
+| Answer correctness | 0.578 |
 
 ## Out of scope
 
-Auth, multi-user, object storage, hybrid search, reranking, HNSW, streaming, unit test suite.
+Auth, multi-user, object storage, hybrid search, reranking, HNSW, streaming, unit test suite, LLM-as-judge evaluation.

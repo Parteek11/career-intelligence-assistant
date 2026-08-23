@@ -1,6 +1,6 @@
 # Architecture
 
-Single-user Next.js App Router MVP. PostgreSQL + pgvector is the only datastore. Evaluation lives outside `src/` and is not imported by the app.
+Single-user Next.js App Router MVP. PostgreSQL + pgvector is the only datastore. Evaluation lives outside `src/` (`evaluation/run.ts`) and is not imported by the app.
 
 ## Layers
 

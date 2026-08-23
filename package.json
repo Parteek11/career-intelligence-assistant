@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "db:migrate": "node src/db/migrate.mjs",
-    "eval:retrieval": "tsx --tsconfig evaluation/tsconfig.eval.json evaluation/retrieval/run-evaluation.ts"
+    "eval": "tsx --tsconfig evaluation/tsconfig.eval.json evaluation/run.ts",
+    "eval:retrieval": "tsx --tsconfig evaluation/tsconfig.eval.json evaluation/run.ts"
   },
   "dependencies": {
     "@huggingface/transformers": "^3.8.1",

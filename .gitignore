@@ -42,5 +42,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# evaluation results (timestamped runs; latest.json is committed as an example)
-evaluation/results/retrieval-eval-*.json
+# evaluation results (keep latest.json as an example)
+evaluation/results/eval-*.json

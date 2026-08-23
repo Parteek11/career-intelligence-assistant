@@ -1,362 +1,326 @@
 {
-  "timestamp": "2026-08-15T14:41:50.600Z",
-  "datasetSize": 10,
-  "configuration": {
-    "topK": 5,
-    "embeddingModel": "Xenova/all-MiniLM-L6-v2",
-    "chunkSize": 900,
-    "chunkOverlap": 120
-  },
+  "timestamp": "2026-08-23T10:35:48.362Z",
+  "datasetSize": 6,
+  "topK": 5,
   "perQuestion": [
     {
-      "id": "technical-01",
+      "id": "q1-resume-skills",
       "question": "What technical skills does the candidate have?",
-      "targetJobId": "all",
-      "topK": 5,
-      "latencyMs": 9.32,
+      "target": "job_1",
       "retrieved": [
         {
+          "documentType": "resume",
+          "jobId": null,
+          "filename": "resume.pdf",
+          "chunkIndex": 6,
+          "similarity": 0.42231820755248806
+        },
+        {
           "documentType": "job_description",
-          "jobId": "c2e4d87c-77b3-4eb4-833f-ada8bba41fb2",
-          "filename": "golden-job-1-backend.txt",
-          "chunkIndex": 0,
-          "similarity": 0.3319575095303382
+          "jobId": "34cf8112-6756-458d-82e5-233480352985",
+          "filename": "job-1.pdf",
+          "chunkIndex": 4,
+          "similarity": 0.399402982032122
+        },
+        {
+          "documentType": "job_description",
+          "jobId": "34cf8112-6756-458d-82e5-233480352985",
+          "filename": "job-1.pdf",
+          "chunkIndex": 3,
+          "similarity": 0.3940947886761961
         },
         {
           "documentType": "resume",
           "jobId": null,
-          "filename": "golden-resume.txt",
+          "filename": "resume.pdf",
           "chunkIndex": 0,
-          "similarity": 0.2990162790407973
+          "similarity": 0.38057768344879417
         },
         {
-          "documentType": "job_description",
-          "jobId": "0edbc210-1a8e-4ec1-9a2b-8768156fb443",
-          "filename": "golden-job-2-frontend.txt",
-          "chunkIndex": 0,
-          "similarity": 0.26847253629728984
-        },
-        {
-          "documentType": "job_description",
-          "jobId": "8ddde365-a342-4aa6-b2ad-c68c76ae2c5e",
-          "filename": "golden-job-3-cloud.txt",
-          "chunkIndex": 0,
-          "similarity": 0.24225653523364077
-        },
-        {
-          "documentType": "job_description",
-          "jobId": "5399153b-0b2a-452e-b2b3-580bf969dca0",
-          "filename": "golden-job-4-ai-rag.txt",
-          "chunkIndex": 0,
-          "similarity": 0.16900210565316076
+          "documentType": "resume",
+          "jobId": null,
+          "filename": "resume.pdf",
+          "chunkIndex": 1,
+          "similarity": 0.33142470325754103
         }
       ],
-      "metrics": {
-        "precisionAtK": 0.2,
-        "recallAtK": 1,
-        "conceptHitRate": 1,
-        "jobFilterAccuracy": null,
-        "jobCoverage": 1
+      "generatedAnswer": "The candidate’s technical skills include: React.js, Next.js, React Native, TypeScript, JavaScript (ES6+), Redux Toolkit, Tailwind CSS, Material UI, Node.js, Python, Express.js, FastAPI, REST APIs, GraphQL, PostgreSQL, MongoDB, Prisma ORM, Sequelize, SQL, kafqa, OpenAI, Claude Code, LangChain, RAG pipelines, LLM fine‑tuning, Agentic AI workflows, GitHub Copilot, Cursor, AWS (Lambda, API Gateway, S3, CloudFront, Cognito), Serverless, Kubernetes, Docker, Terraform, CI/CD (GitHub Actions, Jenkins), Jest, Cypress, React Testing Library.",
+      "retrieval": {
+        "precisionAtK": 0.6,
+        "recallAtK": 0.6
+      },
+      "generation": {
+        "faithfulness": 0.9333333333333333,
+        "answerRelevance": 1,
+        "answerCorrectness": 0.7083333333333334
       }
     },
     {
-      "id": "backend-01",
-      "question": "Does the candidate have backend engineering experience relevant to this role?",
-      "targetJobId": "job_1",
-      "topK": 5,
-      "latencyMs": 3.01,
+      "id": "q2-job1-requirements",
+      "question": "What skills does the MERN Stack Developer role require?",
+      "target": "job_1",
       "retrieved": [
         {
           "documentType": "job_description",
-          "jobId": "c2e4d87c-77b3-4eb4-833f-ada8bba41fb2",
-          "filename": "golden-job-1-backend.txt",
+          "jobId": "34cf8112-6756-458d-82e5-233480352985",
+          "filename": "job-1.pdf",
           "chunkIndex": 0,
-          "similarity": 0.5697697920842104
+          "similarity": 0.585679394433575
+        },
+        {
+          "documentType": "job_description",
+          "jobId": "34cf8112-6756-458d-82e5-233480352985",
+          "filename": "job-1.pdf",
+          "chunkIndex": 3,
+          "similarity": 0.5694519956103572
         },
         {
           "documentType": "resume",
           "jobId": null,
-          "filename": "golden-resume.txt",
+          "filename": "resume.pdf",
           "chunkIndex": 0,
-          "similarity": 0.4399306655136943
+          "similarity": 0.43919360496826787
+        },
+        {
+          "documentType": "resume",
+          "jobId": null,
+          "filename": "resume.pdf",
+          "chunkIndex": 6,
+          "similarity": 0.4110273208683368
+        },
+        {
+          "documentType": "resume",
+          "jobId": null,
+          "filename": "resume.pdf",
+          "chunkIndex": 1,
+          "similarity": 0.381361158218666
         }
       ],
-      "metrics": {
+      "generatedAnswer": "The MERN Stack Developer role requires:\n- 2‑4 years of MERN experience\n- Proficiency with MongoDB, Express.js, React, and Node.js\n- Strong API development and integration skills\n- Familiarity with modern frontend tools such as Redux, Webpack, and Babel\n- Good understanding of Git version control\n- Experience with cloud platforms (AWS, Azure, or Google Cloud)\n- Ability to write clean, well‑documented, efficient code\n- Knowledge of web security best practices\n- Excellent communication and collaboration skills\n- (Optional) Experience with Docker containerization\n- Preferred: GraphQL, TypeScript, and microservices architecture",
+      "retrieval": {
+        "precisionAtK": 0.4,
+        "recallAtK": 0.4
+      },
+      "generation": {
+        "faithfulness": 0.896551724137931,
+        "answerRelevance": 0.8333333333333334,
+        "answerCorrectness": 0.72
+      }
+    },
+    {
+      "id": "q3-job1-gaps",
+      "question": "What skills is the candidate missing for the MERN Stack Developer role?",
+      "target": "job_1",
+      "retrieved": [
+        {
+          "documentType": "job_description",
+          "jobId": "34cf8112-6756-458d-82e5-233480352985",
+          "filename": "job-1.pdf",
+          "chunkIndex": 0,
+          "similarity": 0.5968901649045157
+        },
+        {
+          "documentType": "job_description",
+          "jobId": "34cf8112-6756-458d-82e5-233480352985",
+          "filename": "job-1.pdf",
+          "chunkIndex": 3,
+          "similarity": 0.506668030420809
+        },
+        {
+          "documentType": "resume",
+          "jobId": null,
+          "filename": "resume.pdf",
+          "chunkIndex": 0,
+          "similarity": 0.46295518345444164
+        },
+        {
+          "documentType": "resume",
+          "jobId": null,
+          "filename": "resume.pdf",
+          "chunkIndex": 6,
+          "similarity": 0.40806684325732556
+        },
+        {
+          "documentType": "resume",
+          "jobId": null,
+          "filename": "resume.pdf",
+          "chunkIndex": 1,
+          "similarity": 0.38192478795429907
+        }
+      ],
+      "generatedAnswer": "Based on the provided evidence, the candidate’s resume does not show explicit experience or certification in the following areas required or preferred for the MERN Stack Developer role: Webpack, Babel, formal Git version‑control usage, web‑security best practices, Agile development methodology, an AWS Cloud Practitioner certification, and a stated focus on microservices architecture.",
+      "retrieval": {
         "precisionAtK": 1,
-        "recallAtK": 1,
-        "conceptHitRate": 1,
-        "jobFilterAccuracy": 1,
-        "jobCoverage": null
+        "recallAtK": 1
+      },
+      "generation": {
+        "faithfulness": 0.47368421052631576,
+        "answerRelevance": 0.7142857142857143,
+        "answerCorrectness": 0.4444444444444444
       }
     },
     {
-      "id": "frontend-01",
-      "question": "What frontend skills are required for this role?",
-      "targetJobId": "job_2",
-      "topK": 5,
-      "latencyMs": 2.42,
+      "id": "q4-job2-rag",
+      "question": "What RAG or generative AI work is required for the Staff Software Engineer role?",
+      "target": "job_2",
       "retrieved": [
         {
           "documentType": "job_description",
-          "jobId": "0edbc210-1a8e-4ec1-9a2b-8768156fb443",
-          "filename": "golden-job-2-frontend.txt",
-          "chunkIndex": 0,
-          "similarity": 0.5262916182130738
+          "jobId": "1978559e-ef67-449b-a1dd-1b001004cd34",
+          "filename": "job-2.pdf",
+          "chunkIndex": 1,
+          "similarity": 0.5563570229559909
+        },
+        {
+          "documentType": "job_description",
+          "jobId": "1978559e-ef67-449b-a1dd-1b001004cd34",
+          "filename": "job-2.pdf",
+          "chunkIndex": 3,
+          "similarity": 0.5471986093525739
         },
         {
           "documentType": "resume",
           "jobId": null,
-          "filename": "golden-resume.txt",
+          "filename": "resume.pdf",
           "chunkIndex": 0,
-          "similarity": 0.48730942153078627
-        }
-      ],
-      "metrics": {
-        "precisionAtK": 0.5,
-        "recallAtK": 1,
-        "conceptHitRate": 1,
-        "jobFilterAccuracy": 1,
-        "jobCoverage": null
-      }
-    },
-    {
-      "id": "cloud-01",
-      "question": "What cloud skills are required for this role?",
-      "targetJobId": "job_3",
-      "topK": 5,
-      "latencyMs": 2.6,
-      "retrieved": [
-        {
-          "documentType": "job_description",
-          "jobId": "8ddde365-a342-4aa6-b2ad-c68c76ae2c5e",
-          "filename": "golden-job-3-cloud.txt",
-          "chunkIndex": 0,
-          "similarity": 0.5848352616436391
+          "similarity": 0.4952463501985491
         },
         {
           "documentType": "resume",
           "jobId": null,
-          "filename": "golden-resume.txt",
-          "chunkIndex": 0,
-          "similarity": 0.4647413471186972
-        }
-      ],
-      "metrics": {
-        "precisionAtK": 0.5,
-        "recallAtK": 1,
-        "conceptHitRate": 1,
-        "jobFilterAccuracy": 1,
-        "jobCoverage": null
-      }
-    },
-    {
-      "id": "ai-rag-01",
-      "question": "What AI or RAG-related skills are required for this job?",
-      "targetJobId": "job_4",
-      "topK": 5,
-      "latencyMs": 3.43,
-      "retrieved": [
-        {
-          "documentType": "job_description",
-          "jobId": "5399153b-0b2a-452e-b2b3-580bf969dca0",
-          "filename": "golden-job-4-ai-rag.txt",
-          "chunkIndex": 0,
-          "similarity": 0.3966579735279083
+          "filename": "resume.pdf",
+          "chunkIndex": 1,
+          "similarity": 0.43694333168357613
         },
         {
           "documentType": "resume",
           "jobId": null,
-          "filename": "golden-resume.txt",
-          "chunkIndex": 0,
-          "similarity": 0.27985671162605286
+          "filename": "resume.pdf",
+          "chunkIndex": 6,
+          "similarity": 0.3458915960095761
         }
       ],
-      "metrics": {
-        "precisionAtK": 0.5,
-        "recallAtK": 1,
-        "conceptHitRate": 1,
-        "jobFilterAccuracy": 1,
-        "jobCoverage": null
+      "generatedAnswer": "The role calls for designing and building production‑grade generative‑AI solutions, specifically: • Developing AI‑powered applications that include production Retrieval‑Augmented Generation (RAG) systems, LLM integrations and optimized retrieval pipelines. • Architecting RAG systems for complex use‑cases across teams, using advanced techniques such as hybrid search, reranking and query expansion. • Establishing RAG best‑practice standards, annotation guidelines and evaluation strategies, and mentoring engineers on these practices. • Delivering hands‑on, production‑ready generative‑AI applications (LLM integrations, vector databases, evaluation pipelines).",
+      "retrieval": {
+        "precisionAtK": 0.4,
+        "recallAtK": 0.4
+      },
+      "generation": {
+        "faithfulness": 0.6545454545454545,
+        "answerRelevance": 0.375,
+        "answerCorrectness": 0.72
       }
     },
     {
-      "id": "leadership-01",
+      "id": "q5-leadership",
       "question": "Does the candidate have leadership or mentoring experience?",
-      "targetJobId": "job_1",
-      "topK": 5,
-      "latencyMs": 2.57,
+      "target": "job_2",
       "retrieved": [
         {
           "documentType": "job_description",
-          "jobId": "c2e4d87c-77b3-4eb4-833f-ada8bba41fb2",
-          "filename": "golden-job-1-backend.txt",
-          "chunkIndex": 0,
-          "similarity": 0.3124929573389319
+          "jobId": "1978559e-ef67-449b-a1dd-1b001004cd34",
+          "filename": "job-2.pdf",
+          "chunkIndex": 18,
+          "similarity": 0.3933869048087433
+        },
+        {
+          "documentType": "job_description",
+          "jobId": "1978559e-ef67-449b-a1dd-1b001004cd34",
+          "filename": "job-2.pdf",
+          "chunkIndex": 3,
+          "similarity": 0.3759605324327755
         },
         {
           "documentType": "resume",
           "jobId": null,
-          "filename": "golden-resume.txt",
+          "filename": "resume.pdf",
           "chunkIndex": 0,
-          "similarity": 0.22716777295394475
+          "similarity": 0.17538751895689175
+        },
+        {
+          "documentType": "resume",
+          "jobId": null,
+          "filename": "resume.pdf",
+          "chunkIndex": 2,
+          "similarity": 0.157999299108753
+        },
+        {
+          "documentType": "resume",
+          "jobId": null,
+          "filename": "resume.pdf",
+          "chunkIndex": 6,
+          "similarity": 0.1308381571383872
         }
       ],
-      "metrics": {
-        "precisionAtK": 0.5,
-        "recallAtK": 1,
-        "conceptHitRate": 1,
-        "jobFilterAccuracy": 1,
-        "jobCoverage": null
+      "generatedAnswer": "Yes, the candidate has leadership and mentoring experience. Their resume shows they have led small engineering teams across multiple domains, served as Technical Lead, led a core engineering team at Perficient, and guided engineers to improve development velocity.",
+      "retrieval": {
+        "precisionAtK": 0.6,
+        "recallAtK": 0.6
+      },
+      "generation": {
+        "faithfulness": 0.5833333333333334,
+        "answerRelevance": 0.75,
+        "answerCorrectness": 0.625
       }
     },
     {
-      "id": "domain-01",
-      "question": "Does the candidate have relevant backend systems domain experience for this role?",
-      "targetJobId": "job_1",
-      "topK": 5,
-      "latencyMs": 3.86,
+      "id": "q6-all-jobs-gaps",
+      "question": "What skills are missing for each uploaded job?",
+      "target": "all",
       "retrieved": [
         {
           "documentType": "job_description",
-          "jobId": "c2e4d87c-77b3-4eb4-833f-ada8bba41fb2",
-          "filename": "golden-job-1-backend.txt",
-          "chunkIndex": 0,
-          "similarity": 0.48433846982075224
+          "jobId": "1978559e-ef67-449b-a1dd-1b001004cd34",
+          "filename": "job-2.pdf",
+          "chunkIndex": 16,
+          "similarity": 0.4608065278539899
+        },
+        {
+          "documentType": "job_description",
+          "jobId": "1978559e-ef67-449b-a1dd-1b001004cd34",
+          "filename": "job-2.pdf",
+          "chunkIndex": 14,
+          "similarity": 0.46003907918930054
         },
         {
           "documentType": "resume",
           "jobId": null,
-          "filename": "golden-resume.txt",
+          "filename": "resume.pdf",
+          "chunkIndex": 6,
+          "similarity": 0.3923551855193135
+        },
+        {
+          "documentType": "resume",
+          "jobId": null,
+          "filename": "resume.pdf",
           "chunkIndex": 0,
-          "similarity": 0.4579040508499155
+          "similarity": 0.3418300653594777
+        },
+        {
+          "documentType": "resume",
+          "jobId": null,
+          "filename": "resume.pdf",
+          "chunkIndex": 1,
+          "similarity": 0.31186673974593715
         }
       ],
-      "metrics": {
+      "generatedAnswer": "Job 1: Webpack\nBabel\nGit\nWeb security knowledge and best practices\nMicroservices architecture\nAgile development methodologies\nAWS Cloud Practitioner Certified\nJob 2: Bachelor’s degree in Computer Science or related field\nCloudFormation (infrastructure-as-code tool)\nSite Reliability Engineering (observability design, incident response, resilience testing, blameless post-mortems)\nService Management (service offering design, SLA management, service delivery improvement, proactive status communication)",
+      "retrieval": {
         "precisionAtK": 1,
-        "recallAtK": 1,
-        "conceptHitRate": 1,
-        "jobFilterAccuracy": 1,
-        "jobCoverage": null
-      }
-    },
-    {
-      "id": "skill-gap-01",
-      "question": "What skills does the candidate appear to be missing for the cloud infrastructure role?",
-      "targetJobId": "job_3",
-      "topK": 5,
-      "latencyMs": 3.02,
-      "retrieved": [
-        {
-          "documentType": "job_description",
-          "jobId": "8ddde365-a342-4aa6-b2ad-c68c76ae2c5e",
-          "filename": "golden-job-3-cloud.txt",
-          "chunkIndex": 0,
-          "similarity": 0.5927190648411548
-        },
-        {
-          "documentType": "resume",
-          "jobId": null,
-          "filename": "golden-resume.txt",
-          "chunkIndex": 0,
-          "similarity": 0.40342904288422843
-        }
-      ],
-      "metrics": {
-        "precisionAtK": 1,
-        "recallAtK": 1,
-        "conceptHitRate": 1,
-        "jobFilterAccuracy": 1,
-        "jobCoverage": null
-      }
-    },
-    {
-      "id": "interview-prep-01",
-      "question": "What should the candidate prepare to discuss for a technical interview for this backend role?",
-      "targetJobId": "job_1",
-      "topK": 5,
-      "latencyMs": 3.35,
-      "retrieved": [
-        {
-          "documentType": "job_description",
-          "jobId": "c2e4d87c-77b3-4eb4-833f-ada8bba41fb2",
-          "filename": "golden-job-1-backend.txt",
-          "chunkIndex": 0,
-          "similarity": 0.4357257080895649
-        },
-        {
-          "documentType": "resume",
-          "jobId": null,
-          "filename": "golden-resume.txt",
-          "chunkIndex": 0,
-          "similarity": 0.40009096860343474
-        }
-      ],
-      "metrics": {
-        "precisionAtK": 1,
-        "recallAtK": 1,
-        "conceptHitRate": 1,
-        "jobFilterAccuracy": 1,
-        "jobCoverage": null
-      }
-    },
-    {
-      "id": "all-jobs-01",
-      "question": "Which uploaded job requires cloud infrastructure experience?",
-      "targetJobId": "all",
-      "topK": 5,
-      "latencyMs": 2.76,
-      "retrieved": [
-        {
-          "documentType": "job_description",
-          "jobId": "8ddde365-a342-4aa6-b2ad-c68c76ae2c5e",
-          "filename": "golden-job-3-cloud.txt",
-          "chunkIndex": 0,
-          "similarity": 0.6185040399902096
-        },
-        {
-          "documentType": "resume",
-          "jobId": null,
-          "filename": "golden-resume.txt",
-          "chunkIndex": 0,
-          "similarity": 0.4267430258002206
-        },
-        {
-          "documentType": "job_description",
-          "jobId": "c2e4d87c-77b3-4eb4-833f-ada8bba41fb2",
-          "filename": "golden-job-1-backend.txt",
-          "chunkIndex": 0,
-          "similarity": 0.3611447918756707
-        },
-        {
-          "documentType": "job_description",
-          "jobId": "0edbc210-1a8e-4ec1-9a2b-8768156fb443",
-          "filename": "golden-job-2-frontend.txt",
-          "chunkIndex": 0,
-          "similarity": 0.18557386607423476
-        },
-        {
-          "documentType": "job_description",
-          "jobId": "5399153b-0b2a-452e-b2b3-580bf969dca0",
-          "filename": "golden-job-4-ai-rag.txt",
-          "chunkIndex": 0,
-          "similarity": 0.13361473985114158
-        }
-      ],
-      "metrics": {
-        "precisionAtK": 0.2,
-        "recallAtK": 1,
-        "conceptHitRate": 1,
-        "jobFilterAccuracy": null,
-        "jobCoverage": 1
+        "recallAtK": 1
+      },
+      "generation": {
+        "faithfulness": 0.6326530612244898,
+        "answerRelevance": 0.25,
+        "answerCorrectness": 0.25
       }
     }
   ],
   "aggregate": {
-    "precisionAtK": 0.64,
-    "recallAtK": 1,
-    "conceptHitRate": 1,
-    "jobFilterAccuracy": 1,
-    "jobCoverage": 1,
-    "averageLatencyMs": 3.6339999999999995
+    "precisionAtK": 0.6666666666666666,
+    "recallAtK": 0.6666666666666666,
+    "faithfulness": 0.6956835195168095,
+    "answerRelevance": 0.6537698412698413,
+    "answerCorrectness": 0.5779629629629629
   }
 }

@@ -1,0 +1,162 @@
+[
+  {
+    "id": "q1-resume-skills",
+    "question": "What technical skills does the candidate have?",
+    "target": "job_1",
+    "expectedSources": ["resume"],
+    "expectedJobs": [],
+    "referenceAnswer": "The candidate is a Senior Full Stack and AI Engineer with 8+ years of experience. Skills include React.js, Next.js, Node.js, TypeScript, Python, GraphQL, PostgreSQL, MongoDB, AWS, LangChain, RAG pipelines, Docker, Kubernetes, and Terraform."
+  },
+  {
+    "id": "q2-job1-requirements",
+    "question": "What skills does the MERN Stack Developer role require?",
+    "target": "job_1",
+    "expectedSources": ["job_description"],
+    "expectedJobs": ["job_1"],
+    "referenceAnswer": "The MERN Stack Developer role at Veritech.ai requires 2-4 years of experience with MongoDB, Express.js, React, and Node.js. It also asks for REST APIs, Git, cloud platforms such as AWS, and familiarity with Redux, Webpack, and Babel."
+  },
+  {
+    "id": "q3-job1-gaps",
+    "question": "What skills is the candidate missing for the MERN Stack Developer role?",
+    "target": "job_1",
+    "expectedSources": ["resume", "job_description"],
+    "expectedJobs": ["job_1"],
+    "referenceAnswer": "The resume shows React, Node.js, MongoDB, and AWS, but the MERN job also asks for Webpack, Babel, and an AWS Cloud Practitioner certification, which are not listed on the resume."
+  },
+  {
+    "id": "q4-job2-rag",
+    "question": "What RAG or generative AI work is required for the Staff Software Engineer role?",
+    "target": "job_2",
+    "expectedSources": ["job_description"],
+    "expectedJobs": ["job_2"],
+    "referenceAnswer": "The Staff Software Engineer FDE role requires building production RAG systems, LLM integrations, and optimized retrieval pipelines, including hybrid search, reranking, query expansion, and mentoring engineers on RAG best practices."
+  },
+  {
+    "id": "q5-leadership",
+    "question": "Does the candidate have leadership or mentoring experience?",
+    "target": "job_2",
+    "expectedSources": ["resume"],
+    "expectedJobs": [],
+    "referenceAnswer": "Yes. The candidate is a Technical Lead at EMIDS, led a core engineering team at Perficient, and has experience guiding engineers and leading small engineering teams."
+  },
+  {
+    "id": "q6-all-jobs-gaps",
+    "question": "What skills are missing for each uploaded job?",
+    "target": "all",
+    "expectedSources": ["resume", "job_description"],
+    "expectedJobs": ["job_1", "job_2"],
+    "referenceAnswer": "Job 1 MERN Stack Developer: Webpack, Babel, and AWS Cloud Practitioner certification are not listed. Job 2 Staff Software Engineer FDE: the job asks for staff-level RAG architecture, hybrid search, reranking, SRE practices, and mentoring across teams, which go beyond the resume's listed RAG and leadership experience."
+  },
+  {
+    "id": "q7-resume-education",
+    "question": "What is the candidate's education background?",
+    "target": "job_1",
+    "expectedSources": ["resume"],
+    "expectedJobs": [],
+    "referenceAnswer": "The candidate earned a Bachelor of Engineering in Information Technology from UIET, Panjab University, from 2014 to 2018."
+  },
+  {
+    "id": "q8-resume-aws",
+    "question": "What AWS or cloud experience does the candidate list?",
+    "target": "job_1",
+    "expectedSources": ["resume"],
+    "expectedJobs": [],
+    "referenceAnswer": "The resume lists AWS Lambda, API Gateway, S3, CloudFront, and Cognito, plus Serverless, Kubernetes, Docker, Terraform, and CI/CD with GitHub Actions and Jenkins."
+  },
+  {
+    "id": "q9-resume-domains",
+    "question": "Which industry domains has the candidate worked in?",
+    "target": "job_2",
+    "expectedSources": ["resume"],
+    "expectedJobs": [],
+    "referenceAnswer": "The candidate has worked across healthcare, fintech, insurance, and e-commerce, including EMIDS Oxbridge Health, New York Life Insurance, HDFC Bank, and a cryptocurrency trading application."
+  },
+  {
+    "id": "q10-resume-testing",
+    "question": "What testing tools does the candidate know?",
+    "target": "job_1",
+    "expectedSources": ["resume"],
+    "expectedJobs": [],
+    "referenceAnswer": "The resume lists Jest, Cypress, and React Testing Library as testing frameworks."
+  },
+  {
+    "id": "q11-job1-company",
+    "question": "Where is the MERN Stack Developer role located and what company is hiring?",
+    "target": "job_1",
+    "expectedSources": ["job_description"],
+    "expectedJobs": ["job_1"],
+    "referenceAnswer": "The MERN Stack Developer role is at Veritech.ai and the location is remote. The experience level is 2-4 years."
+  },
+  {
+    "id": "q12-job1-preferred",
+    "question": "What preferred qualifications does the MERN Stack Developer job list?",
+    "target": "job_1",
+    "expectedSources": ["job_description"],
+    "expectedJobs": ["job_1"],
+    "referenceAnswer": "Preferred qualifications include GraphQL, TypeScript, microservices and distributed systems, prior AI-driven or data-heavy application experience, Agile, and AWS Cloud Practitioner certification."
+  },
+  {
+    "id": "q13-job1-responsibilities",
+    "question": "What are the key responsibilities of the MERN Stack Developer role?",
+    "target": "job_1",
+    "expectedSources": ["job_description"],
+    "expectedJobs": ["job_1"],
+    "referenceAnswer": "Responsibilities include building full-stack MERN applications, designing REST APIs, managing MongoDB, deploying with CI/CD in the cloud, testing and debugging, integrating AI models with data scientists, and participating in code reviews."
+  },
+  {
+    "id": "q14-job1-fit",
+    "question": "How well does the candidate's experience align with the MERN Stack Developer role?",
+    "target": "job_1",
+    "expectedSources": ["resume", "job_description"],
+    "expectedJobs": ["job_1"],
+    "referenceAnswer": "The candidate has strong React, Node.js, MongoDB, REST and GraphQL API, and AWS experience, which matches the MERN stack. Alignment is weaker on Webpack, Babel, and the AWS Cloud Practitioner certification. The candidate also has more than the requested 2-4 years of experience."
+  },
+  {
+    "id": "q15-job2-company",
+    "question": "What company is hiring for the Staff Software Engineer FDE role and where is it located?",
+    "target": "job_2",
+    "expectedSources": ["job_description"],
+    "expectedJobs": ["job_2"],
+    "referenceAnswer": "Newpage Solutions is hiring a Staff Software Engineer FDE. The role is full-time in Chennai. The company is a digital health innovation company working with life sciences, pharmaceutical, biotech, and healthcare organizations."
+  },
+  {
+    "id": "q16-job2-reliability",
+    "question": "What reliability or SRE expectations does the Staff Software Engineer role have?",
+    "target": "job_2",
+    "expectedSources": ["job_description"],
+    "expectedJobs": ["job_2"],
+    "referenceAnswer": "The job asks the engineer to define reliability standards across teams, drive post-incident improvements, design capacity planning processes, and mentor engineers on SRE practices."
+  },
+  {
+    "id": "q17-job2-people",
+    "question": "What people leadership does the Staff Software Engineer FDE job expect?",
+    "target": "job_2",
+    "expectedSources": ["job_description"],
+    "expectedJobs": ["job_2"],
+    "referenceAnswer": "The role expects building high-performing teams, mentoring engineers, influencing stakeholders from frontline to executive, handling difficult conversations, and creating psychological safety."
+  },
+  {
+    "id": "q18-job2-fit",
+    "question": "How well does the candidate fit the Staff Software Engineer FDE role?",
+    "target": "job_2",
+    "expectedSources": ["resume", "job_description"],
+    "expectedJobs": ["job_2"],
+    "referenceAnswer": "The candidate has healthcare domain work, LangChain, RAG pipelines, LLM tooling, full-stack React and Node, and team leadership, which overlap the FDE mission. The job also asks for staff-level RAG architecture, hybrid search, reranking, SRE standards, and mentoring across multiple teams, which are only partly evidenced on the resume."
+  },
+  {
+    "id": "q19-all-jobs-identify",
+    "question": "Which uploaded job is the MERN Stack Developer role and which is the Staff Software Engineer FDE role?",
+    "target": "all",
+    "expectedSources": ["job_description"],
+    "expectedJobs": ["job_1", "job_2"],
+    "referenceAnswer": "Job 1 is the MERN Stack Developer role at Veritech.ai. Job 2 is the Staff Software Engineer FDE role at Newpage Solutions in Chennai."
+  },
+  {
+    "id": "q20-all-jobs-ai",
+    "question": "How does the candidate's AI experience compare to both uploaded jobs?",
+    "target": "all",
+    "expectedSources": ["resume", "job_description"],
+    "expectedJobs": ["job_1", "job_2"],
+    "referenceAnswer": "The resume lists LangChain, RAG pipelines, LLM fine tuning, and AI-enabled healthcare work. Job 1 prefers prior AI-driven application experience and collaboration with data scientists. Job 2 requires production RAG systems, hybrid search, reranking, and RAG standards across teams. The candidate matches Job 1's AI preference more closely than Job 2's staff-level RAG architecture bar."
+  }
+]
